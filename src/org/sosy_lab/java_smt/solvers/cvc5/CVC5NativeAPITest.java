@@ -46,13 +46,12 @@ import org.sosy_lab.common.NativeLibraries;
 public class CVC5NativeAPITest {
 
   private static final String INVALID_GETVALUE_STRING_SAT =
-      "Cannot get value unless after a SAT or UNKNOWN response.";
+      "cannot get value unless after a SAT or UNKNOWN response.";
 
-  private static final String INVALID_TERM_BOUND_VAR =
-      "Cannot process term .* with free variables: .*";
+  private static final String INVALID_TERM_BOUND_VAR = "cannot process term .* with free variables";
 
   private static final String INVALID_MODEL_STRING =
-      "Cannot get model unless after a SAT or UNKNOWN response.";
+      "cannot get model unless after a SAT or UNKNOWN response.";
 
   @BeforeClass
   public static void loadCVC5() {
@@ -85,7 +84,6 @@ public class CVC5NativeAPITest {
     newSolver.setOption("incremental", "true");
     newSolver.setOption("produce-models", "true");
     newSolver.setOption("finite-model-find", "true");
-    newSolver.setOption("sets-ext", "true");
     newSolver.setOption("output-language", "smtlib2");
     newSolver.setOption("strings-exp", "true");
 
@@ -134,7 +132,7 @@ public class CVC5NativeAPITest {
     Exception e = assertThrows(io.github.cvc5.CVC5ApiException.class, intVar::getIntegerValue);
     assertThat(e.toString())
         .contains(
-            "Invalid argument 'int_const' for '*d_node', expected Term to be an integer value when"
+            "invalid argument 'int_const' for '*d_node', expected Term to be an integer value when"
                 + " calling getIntegerValue()");
     // Build a formula such that is has a value, assert and check sat and then check again
     Term equality = termManager.mkTerm(Kind.EQUAL, intVar, termManager.mkInteger(1));
@@ -201,8 +199,8 @@ public class CVC5NativeAPITest {
             () -> termManager.mkFloatingPoint(8, 24, bvOneFourth));
     assertThat(e.toString())
         .contains(
-            "Invalid argument '((_ int2bv 32) (to_int (/ 1 4)))' for 'val', expected bit-vector"
-                + " constant");
+            "invalid argument '((_ int2bv 32) (to_int (/ 1 4)))' for 'val', expected bit-vector"
+                + " value");
   }
 
   @Test
@@ -579,7 +577,7 @@ public class CVC5NativeAPITest {
     Exception e =
         assertThrows(
             io.github.cvc5.CVC5ApiRecoverableException.class, () -> solver.getModel(sorts, terms));
-    assertThat(e.toString()).contains("Expecting an uninterpreted sort as argument to getModel.");
+    assertThat(e.toString()).contains("expected an uninterpreted sort as argument to getModel.");
   }
 
   /** Same as checkGetModelSatInvalidSort but with invalid term. */
@@ -594,7 +592,7 @@ public class CVC5NativeAPITest {
     Exception e =
         assertThrows(
             io.github.cvc5.CVC5ApiRecoverableException.class, () -> solver.getModel(sorts, terms));
-    assertThat(e.toString()).contains("Expecting a free constant as argument to getModel.");
+    assertThat(e.toString()).contains("expected a free constant as argument to getModel.");
   }
 
   @Test
@@ -670,7 +668,7 @@ public class CVC5NativeAPITest {
   public void checkBvInvalidZeroWidthAssertion() {
     Exception e =
         assertThrows(io.github.cvc5.CVC5ApiException.class, () -> termManager.mkBitVector(0, 1));
-    assertThat(e.toString()).contains("Invalid argument '0' for 'size', expected a bit-width > 0");
+    assertThat(e.toString()).contains("invalid argument '0' for 'size', expected a bit-width > 0");
   }
 
   @Test
@@ -949,13 +947,7 @@ public class CVC5NativeAPITest {
 
     Term quantElim = solver.getQuantifierElimination(assertion);
 
-    assertThat(quantElim.toString())
-        .isEqualTo(
-            "(= (bvmul x_bv (witness ((x0 (_ BitVec 2))) (or (= (bvmul x_bv x0) #b01) (not (="
-                + " (concat #b0 ((_ extract 0 0) (bvor x_bv (bvneg x_bv)))) #b01))))) #b01)");
-
-    // TODO: formely you could get a better result Term by using getValue(). But now getValue() only
-    // works after SAT since 1.0.0 and then getValue() prints trivial statements like false.
+    assertThat(quantElim.toString()).isEqualTo("(or (= #b01 (bvneg x_bv)) (= #b01 x_bv))");
   }
 
   @Test
