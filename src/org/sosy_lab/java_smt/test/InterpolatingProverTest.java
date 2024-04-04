@@ -344,21 +344,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     // sequential interpolation should always work as expected
     checkItpSequence(ImmutableList.of(A, B, C), itpSeq);
-
-    if (solverToUse() == Solvers.CVC5) {
-      assertThatFormula(A).implies(itp1);
-      assertThatFormula(bmgr.and(A, B)).implies(itp2);
-      assertThatFormula(bmgr.and(itp1, B, C)).isUnsatisfiable();
-      assertThatFormula(bmgr.and(itp2, C)).isUnsatisfiable();
-
-      // this is a counterexample for sequential interpolation via individual interpolants:
-      assertThatFormula(bmgr.not(bmgr.implication(bmgr.and(itp1, B), itp2))).isSatisfiable();
-
-    } else {
-      // other solvers satisfy this condition,
-      // because they internally use the same proof for all interpolation queries
-      checkItpSequence(ImmutableList.of(A, B, C), List.of(itp1, itp2));
-    }
+    checkItpSequence(ImmutableList.of(A, B, C), List.of(itp1, itp2));
   }
 
   @Test
