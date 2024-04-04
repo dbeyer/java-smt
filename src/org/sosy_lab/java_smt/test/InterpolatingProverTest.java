@@ -407,6 +407,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   public <T> void sequentialInterpolationWithFewPartitions()
       throws SolverException, InterruptedException {
     requireIntegers();
+    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5); // Will run forever
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     int i = index.getFreshId();

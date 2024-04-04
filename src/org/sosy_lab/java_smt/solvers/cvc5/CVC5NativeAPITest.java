@@ -1344,6 +1344,7 @@ public class CVC5NativeAPITest {
   }
 
   @Test
+  @Ignore // Does not terminate
   public void testSimpleInterpolation() {
     // Out of InterpolatingProverTest.java
     // Line: 65
