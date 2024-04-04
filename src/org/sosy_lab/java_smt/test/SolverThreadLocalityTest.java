@@ -43,7 +43,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   private static final int DEFAULT_PROBLEM_SIZE = 8;
 
   private static final Collection<Solvers> SOLVERS_NOT_SUPPORTING_FORMULA_THREAD_SHARING =
-      ImmutableList.of(Solvers.CVC5);
+      ImmutableList.of(); // TODO: Remove this
 
   @Before
   public void makeThreads() {
@@ -79,7 +79,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   public void nonLocalContextTest()
       throws ExecutionException, InterruptedException, SolverException {
     requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     // generate a new context in another thread, i.e., non-locally
     Future<SolverContext> result = executor.submit(() -> factory.generateContext());
@@ -114,7 +113,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   public void nonLocalFormulaTest()
       throws InterruptedException, SolverException, ExecutionException {
     requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     // generate a new formula in another thread, i.e., non-locally
     Future<BooleanFormula> result =
@@ -143,8 +141,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   @Test
   public void nonLocalProverTest() throws InterruptedException, ExecutionException {
     requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
-
     BooleanFormula formula = hardProblem.generate(DEFAULT_PROBLEM_SIZE);
 
     // generate a new prover in another thread, i.e., non-locally
@@ -264,7 +260,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   public <T> void nonLocalInterpolationTest() throws InterruptedException, ExecutionException {
     requireIntegers();
     requireInterpolation();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     BooleanFormula f1 = imgr.lessThan(imgr.makeVariable("A"), imgr.makeVariable("B"));
     BooleanFormula f2 = imgr.lessThan(imgr.makeVariable("B"), imgr.makeVariable("A"));

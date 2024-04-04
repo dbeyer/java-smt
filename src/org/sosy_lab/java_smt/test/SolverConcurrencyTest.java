@@ -344,11 +344,6 @@ public class SolverConcurrencyTest {
   public void testIntConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
     requireIntegers();
 
-    assume()
-        .withMessage("Solver does not support concurrency without concurrent context.")
-        .that(solver)
-        .isNotEqualTo(Solvers.CVC5);
-
     ConcurrentLinkedQueue<SolverContext> contextList = new ConcurrentLinkedQueue<>();
     // Initialize contexts before using them in the threads
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
@@ -368,11 +363,6 @@ public class SolverConcurrencyTest {
   @Test
   public void testBvConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
     requireBitvectors();
-
-    assume()
-        .withMessage("Solver does not support concurrency without concurrent context.")
-        .that(solver)
-        .isNotEqualTo(Solvers.CVC5);
 
     ConcurrentLinkedQueue<SolverContext> contextList = new ConcurrentLinkedQueue<>();
     // Initialize contexts before using them in the threads
