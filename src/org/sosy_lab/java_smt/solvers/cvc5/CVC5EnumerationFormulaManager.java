@@ -14,25 +14,27 @@ import io.github.cvc5.Kind;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
+import io.github.cvc5.TermManager;
 import org.sosy_lab.java_smt.api.FormulaType.EnumerationFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractEnumerationFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class CVC5EnumerationFormulaManager
-    extends AbstractEnumerationFormulaManager<Term, Sort, Solver, Term> {
+    extends AbstractEnumerationFormulaManager<Term, Sort, TermManager, Term> {
 
+  private final TermManager termManager;
   private final Solver solver;
 
-  protected CVC5EnumerationFormulaManager(FormulaCreator<Term, Sort, Solver, Term> pCreator) {
+  protected CVC5EnumerationFormulaManager(CVC5FormulaCreator pCreator) {
     super(pCreator);
-    solver = pCreator.getEnv();
+    termManager = pCreator.getEnv();
+    solver = pCreator.getSolver();
   }
 
   @Override
   protected EnumType declareEnumeration0(EnumerationFormulaType pType) {
     DatatypeConstructorDecl[] constructors =
         pType.getElements().stream()
-            .map(solver::mkDatatypeConstructorDecl)
+            .map(termManager::mkDatatypeConstructorDecl)
             .toArray(DatatypeConstructorDecl[]::new);
     Sort enumType = solver.declareDatatype(pType.getName(), constructors);
 
@@ -40,13 +42,13 @@ public class CVC5EnumerationFormulaManager
     ImmutableMap.Builder<String, Term> constantsMapping = ImmutableMap.builder();
     for (String element : pType.getElements()) {
       Term decl = enumType.getDatatype().getConstructor(element).getTerm();
-      constantsMapping.put(element, solver.mkTerm(Kind.APPLY_CONSTRUCTOR, decl));
+      constantsMapping.put(element, termManager.mkTerm(Kind.APPLY_CONSTRUCTOR, decl));
     }
     return new EnumType(pType, enumType, constantsMapping.buildOrThrow());
   }
 
   @Override
   protected Term equivalenceImpl(Term pF1, Term pF2) {
-    return solver.mkTerm(Kind.EQUAL, pF1, pF2);
+    return termManager.mkTerm(Kind.EQUAL, pF1, pF2);
   }
 }

@@ -12,26 +12,26 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterables;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
-import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
+import io.github.cvc5.TermManager;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 public class CVC5BooleanFormulaManager
-    extends AbstractBooleanFormulaManager<Term, Sort, Solver, Term> {
+    extends AbstractBooleanFormulaManager<Term, Sort, TermManager, Term> {
 
-  private final Solver solver;
+  private final TermManager termManager;
   private final Term pTrue;
   private final Term pFalse;
 
   protected CVC5BooleanFormulaManager(CVC5FormulaCreator pCreator) {
     super(pCreator);
-    solver = pCreator.getEnv();
-    pTrue = solver.mkBoolean(true);
-    pFalse = solver.mkBoolean(false);
+    termManager = pCreator.getEnv();
+    pTrue = termManager.mkBoolean(true);
+    pFalse = termManager.mkBoolean(false);
   }
 
   @Override
@@ -58,7 +58,7 @@ public class CVC5BooleanFormulaManager
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException("Failure when negating the term '" + pParam1 + "'.", e);
     }
-    return solver.mkTerm(Kind.NOT, pParam1);
+    return termManager.mkTerm(Kind.NOT, pParam1);
   }
 
   @Override
@@ -74,7 +74,7 @@ public class CVC5BooleanFormulaManager
     } else if (pParam1.equals(pParam2)) {
       return pParam1;
     }
-    return solver.mkTerm(Kind.AND, pParam1, pParam2);
+    return termManager.mkTerm(Kind.AND, pParam1, pParam2);
   }
 
   @Override
@@ -96,7 +96,7 @@ public class CVC5BooleanFormulaManager
       case 1:
         return Iterables.getOnlyElement(operands);
       default:
-        return solver.mkTerm(Kind.AND, operands.toArray(new Term[0]));
+        return termManager.mkTerm(Kind.AND, operands.toArray(new Term[0]));
     }
   }
 
@@ -113,7 +113,7 @@ public class CVC5BooleanFormulaManager
     } else if (pParam1.equals(pParam2)) {
       return pParam1;
     }
-    return solver.mkTerm(Kind.OR, pParam1, pParam2);
+    return termManager.mkTerm(Kind.OR, pParam1, pParam2);
   }
 
   @Override
@@ -135,23 +135,23 @@ public class CVC5BooleanFormulaManager
       case 1:
         return Iterables.getOnlyElement(operands);
       default:
-        return solver.mkTerm(Kind.OR, operands.toArray(new Term[0]));
+        return termManager.mkTerm(Kind.OR, operands.toArray(new Term[0]));
     }
   }
 
   @Override
   protected Term xor(Term pParam1, Term pParam2) {
-    return solver.mkTerm(Kind.XOR, pParam1, pParam2);
+    return termManager.mkTerm(Kind.XOR, pParam1, pParam2);
   }
 
   @Override
   protected Term equivalence(Term pBits1, Term pBits2) {
-    return solver.mkTerm(Kind.EQUAL, pBits1, pBits2);
+    return termManager.mkTerm(Kind.EQUAL, pBits1, pBits2);
   }
 
   @Override
   protected Term implication(Term bits1, Term bits2) {
-    return solver.mkTerm(Kind.IMPLIES, bits1, bits2);
+    return termManager.mkTerm(Kind.IMPLIES, bits1, bits2);
   }
 
   @Override
@@ -177,6 +177,6 @@ public class CVC5BooleanFormulaManager
     } else if (isFalse(pF1) && isTrue(pF2)) {
       return not(pCond);
     }
-    return solver.mkTerm(Kind.ITE, pCond, pF1, pF2);
+    return termManager.mkTerm(Kind.ITE, pCond, pF1, pF2);
   }
 }

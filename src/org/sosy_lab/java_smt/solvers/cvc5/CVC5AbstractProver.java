@@ -17,6 +17,7 @@ import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Result;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Term;
+import io.github.cvc5.TermManager;
 import io.github.cvc5.UnknownExplanation;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -63,8 +64,10 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     mgr = pMgr;
     creator = pFormulaCreator;
     incremental = !enableSL;
-    solver = new Solver();
     assertedTerms.add(PathCopyingPersistentTreeMap.of());
+
+    TermManager termManager = creator.getEnv();
+    solver = new Solver(termManager);
 
     setSolverOptions(randomSeed, pOptions, pFurtherOptionsMap, solver);
   }

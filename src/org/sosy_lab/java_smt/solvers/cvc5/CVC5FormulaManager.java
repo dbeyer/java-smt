@@ -13,16 +13,16 @@ import com.google.common.collect.Iterables;
 import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
-import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
+import io.github.cvc5.TermManager;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
-class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, Solver, Term> {
+class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager, Term> {
 
   private final CVC5FormulaCreator creator;
 

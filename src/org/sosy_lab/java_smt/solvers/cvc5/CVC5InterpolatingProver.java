@@ -20,6 +20,7 @@ import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Term;
+import io.github.cvc5.TermManager;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -33,6 +34,8 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
     implements InterpolatingProverEnvironment<String> {
+
+  private final TermManager termManager = creator.getEnv();
 
   private final FormulaManager mgr;
   private final Set<ProverOptions> solverOptions;
@@ -106,7 +109,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
 
     final int n = partitions.size();
     final List<BooleanFormula> itps = new ArrayList<>();
-    Term previousItp = solver.mkTrue();
+    Term previousItp = termManager.mkTrue();
     for (int i = 1; i < n; i++) {
       Collection<Term> formulasA =
           FluentIterable.from(partitions.get(i - 1))
@@ -181,13 +184,13 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
     Term phiMinus = bmgr.andImpl(formulasB);
 
     // Uses a separate Solver instance to leave the original solver-context unmodified
-    Solver itpSolver = new Solver();
+    Solver itpSolver = new Solver(termManager);
     setSolverOptions(seed, solverOptions, furtherOptionsMap, itpSolver);
 
     Term interpolant;
     try {
       itpSolver.assertFormula(phiPlus);
-      interpolant = itpSolver.getInterpolant(itpSolver.mkTerm(Kind.NOT, phiMinus));
+      interpolant = itpSolver.getInterpolant(termManager.mkTerm(Kind.NOT, phiMinus));
     } finally {
       itpSolver.deletePointer();
     }
@@ -222,19 +225,19 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
         Sets.difference(interpolantSymbols, intersection));
 
     // build and check both Craig interpolation formulas with the generated interpolant.
-    Solver validationSolver = new Solver();
+    Solver validationSolver = new Solver(termManager);
     // interpolation option is not required for validation
     super.setSolverOptions(seed, solverOptions, furtherOptionsMap, validationSolver);
     try {
       validationSolver.push();
-      validationSolver.assertFormula(validationSolver.mkTerm(Kind.IMPLIES, phiPlus, interpolant));
+      validationSolver.assertFormula(termManager.mkTerm(Kind.IMPLIES, phiPlus, interpolant));
       checkState(
           validationSolver.checkSat().isSat(),
           "Invalid Craig interpolation: phi+ does not imply the interpolant.");
       validationSolver.pop();
 
       validationSolver.push();
-      validationSolver.assertFormula(validationSolver.mkTerm(Kind.AND, interpolant, phiMinus));
+      validationSolver.assertFormula(termManager.mkTerm(Kind.AND, interpolant, phiMinus));
       checkState(
           validationSolver.checkSat().isUnsat(),
           "Invalid Craig interpolation: interpolant does not contradict phi-.");

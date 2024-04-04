@@ -15,6 +15,7 @@ import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
 import io.github.cvc5.CVC5ApiRecoverableException;
 import io.github.cvc5.Solver;
+import io.github.cvc5.TermManager;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -72,6 +73,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
 
   // creator is final, except after closing, then null.
   private CVC5FormulaCreator creator;
+  private final TermManager termManager;
   private final Solver solver;
   private final ShutdownNotifier shutdownNotifier;
   private final int randomSeed;
@@ -82,6 +84,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
       CVC5FormulaCreator pCreator,
       CVC5FormulaManager pManager,
       ShutdownNotifier pShutdownNotifier,
+      TermManager pTermManager,
       Solver pSolver,
       int pRandomSeed,
       CVC5Settings pSettings) {
@@ -89,6 +92,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     creator = pCreator;
     shutdownNotifier = pShutdownNotifier;
     randomSeed = pRandomSeed;
+    termManager = pTermManager;
     solver = pSolver;
     settings = pSettings;
   }
@@ -117,9 +121,10 @@ public final class CVC5SolverContext extends AbstractSolverContext {
 
     loadLibrary(pLoader);
 
-    // This Solver is the central class for creating expressions/terms/formulae.
+    // The TermManager is the central class for creating expressions/terms/formulae.
     // We keep this instance available until the whole context is closed.
-    Solver newSolver = new Solver();
+    TermManager termManager = new TermManager();
+    Solver newSolver = new Solver(termManager);
 
     try {
       setSolverOptions(newSolver, randomSeed, settings.furtherOptionsMap);
@@ -127,7 +132,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
       throw new InvalidConfigurationException(e.getMessage(), e);
     }
 
-    CVC5FormulaCreator pCreator = new CVC5FormulaCreator(newSolver);
+    CVC5FormulaCreator pCreator = new CVC5FormulaCreator(termManager, newSolver);
 
     // Create managers
     CVC5UFManager functionTheory = new CVC5UFManager(pCreator);
@@ -161,7 +166,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
             enumTheory);
 
     return new CVC5SolverContext(
-        pCreator, manager, pShutdownNotifier, newSolver, randomSeed, settings);
+        pCreator, manager, pShutdownNotifier, termManager, newSolver, randomSeed, settings);
   }
 
   /**
@@ -207,9 +212,10 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   public void close() {
     if (creator != null) {
       closed = true;
-      solver.deletePointer();
       // Don't use Context.deletePointers(); as it deletes statically information from all
       // existing contexts, not only this one!
+      termManager.deletePointer();
+      solver.deletePointer();
       creator = null;
     }
   }

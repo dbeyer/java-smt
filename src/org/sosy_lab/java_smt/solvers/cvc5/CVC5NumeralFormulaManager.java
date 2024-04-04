@@ -18,9 +18,9 @@ import static io.github.cvc5.Kind.SUB;
 import com.google.common.collect.ImmutableSet;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
-import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
+import io.github.cvc5.TermManager;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -31,7 +31,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 abstract class CVC5NumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     extends AbstractNumeralFormulaManager<
-        Term, Sort, Solver, ParamFormulaType, ResultFormulaType, Term> {
+        Term, Sort, TermManager, ParamFormulaType, ResultFormulaType, Term> {
 
   /**
    * CVC4 fails hard when creating Integers/Rationals instead of throwing an exception for invalid
@@ -49,11 +49,11 @@ abstract class CVC5NumeralFormulaManager<
   private static final ImmutableSet<Kind> NUMERIC_FUNCTIONS =
       ImmutableSet.of(ADD, SUB, MULT, DIVISION, INTS_DIVISION, INTS_MODULUS);
 
-  protected final Solver solver;
+  protected final TermManager termManager;
 
   CVC5NumeralFormulaManager(CVC5FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
-    solver = pCreator.getEnv();
+    termManager = pCreator.getEnv();
   }
 
   protected abstract Sort getNumeralType();
@@ -114,7 +114,7 @@ abstract class CVC5NumeralFormulaManager<
       throw new NumberFormatException("number is not an rational value: " + pI);
     }
     try {
-      return solver.mkReal(pI);
+      return termManager.mkReal(pI);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "You tried creating a invalid rational number with input Sring: " + pI + ".", e);
@@ -129,7 +129,7 @@ abstract class CVC5NumeralFormulaManager<
 
   @Override
   protected Term multiply(Term pParam1, Term pParam2) {
-    return solver.mkTerm(Kind.MULT, pParam1, pParam2);
+    return termManager.mkTerm(Kind.MULT, pParam1, pParam2);
     /*
      * In CVC4 we had to check if the terms consist of only numerals, if this
      * fails we have to do it again!
@@ -143,51 +143,51 @@ abstract class CVC5NumeralFormulaManager<
 
   @Override
   protected Term modulo(Term pParam1, Term pParam2) {
-    return solver.mkTerm(Kind.INTS_MODULUS, pParam1, pParam2);
+    return termManager.mkTerm(Kind.INTS_MODULUS, pParam1, pParam2);
   }
 
   @Override
   protected Term negate(Term pParam1) {
-    return solver.mkTerm(Kind.NEG, pParam1);
+    return termManager.mkTerm(Kind.NEG, pParam1);
   }
 
   @Override
   protected Term add(Term pParam1, Term pParam2) {
-    return solver.mkTerm(Kind.ADD, pParam1, pParam2);
+    return termManager.mkTerm(Kind.ADD, pParam1, pParam2);
   }
 
   @Override
   protected Term subtract(Term pParam1, Term pParam2) {
-    return solver.mkTerm(Kind.SUB, pParam1, pParam2);
+    return termManager.mkTerm(Kind.SUB, pParam1, pParam2);
   }
 
   @Override
   protected Term equal(Term pParam1, Term pParam2) {
-    return solver.mkTerm(Kind.EQUAL, pParam1, pParam2);
+    return termManager.mkTerm(Kind.EQUAL, pParam1, pParam2);
   }
 
   @Override
   protected Term greaterThan(Term pParam1, Term pParam2) {
-    return solver.mkTerm(Kind.GT, pParam1, pParam2);
+    return termManager.mkTerm(Kind.GT, pParam1, pParam2);
   }
 
   @Override
   protected Term greaterOrEquals(Term pParam1, Term pParam2) {
-    return solver.mkTerm(Kind.GEQ, pParam1, pParam2);
+    return termManager.mkTerm(Kind.GEQ, pParam1, pParam2);
   }
 
   @Override
   protected Term lessThan(Term pParam1, Term pParam2) {
-    return solver.mkTerm(Kind.LT, pParam1, pParam2);
+    return termManager.mkTerm(Kind.LT, pParam1, pParam2);
   }
 
   @Override
   protected Term lessOrEquals(Term pParam1, Term pParam2) {
-    return solver.mkTerm(Kind.LEQ, pParam1, pParam2);
+    return termManager.mkTerm(Kind.LEQ, pParam1, pParam2);
   }
 
   @Override
   protected Term distinctImpl(List<Term> pParam) {
-    return solver.mkTerm(Kind.DISTINCT, pParam.toArray(new Term[0]));
+    return termManager.mkTerm(Kind.DISTINCT, pParam.toArray(new Term[0]));
   }
 }

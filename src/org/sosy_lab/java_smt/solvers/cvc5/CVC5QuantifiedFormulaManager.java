@@ -12,21 +12,22 @@ import io.github.cvc5.Kind;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
+import io.github.cvc5.TermManager;
 import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class CVC5QuantifiedFormulaManager
-    extends AbstractQuantifiedFormulaManager<Term, Sort, Solver, Term> {
+    extends AbstractQuantifiedFormulaManager<Term, Sort, TermManager, Term> {
 
+  private final TermManager termManager;
   private final Solver solver;
 
-  protected CVC5QuantifiedFormulaManager(FormulaCreator<Term, Sort, Solver, Term> pFormulaCreator) {
+  protected CVC5QuantifiedFormulaManager(CVC5FormulaCreator pFormulaCreator) {
     super(pFormulaCreator);
-
-    solver = pFormulaCreator.getEnv();
+    termManager = pFormulaCreator.getEnv();
+    solver = new Solver(termManager);
   }
 
   /*
@@ -76,8 +77,8 @@ public class CVC5QuantifiedFormulaManager
       }
 
       Kind quant = pQ == Quantifier.EXISTS ? Kind.EXISTS : Kind.FORALL;
-      Term boundVarsList = solver.mkTerm(Kind.VARIABLE_LIST, boundVars.toArray(new Term[0]));
-      return solver.mkTerm(quant, boundVarsList, substBody);
+      Term boundVarsList = termManager.mkTerm(Kind.VARIABLE_LIST, boundVars.toArray(new Term[0]));
+      return termManager.mkTerm(quant, boundVarsList, substBody);
     }
   }
 }
