@@ -173,14 +173,12 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
         Lists.newArrayList("hello \u00e6@\u20ac \u1234 \u4321"),
         Lists.newArrayList(smgr.makeString("hello \u00e6@\u20ac \u1234 \u4321")));
 
-    // TODO Z3 and CVC4 seem to break escaping on invalid Unicode Strings.
-    /*
-      evaluateInModel(
+    // invalid Unicode escape sequences (should be treated as normal characters)
+    evaluateInModel(
         smgr.equal(smgr.makeVariable("x"), smgr.makeString("\\u")),
         smgr.makeVariable("x"),
         Lists.newArrayList("\\u"),
         Lists.newArrayList(smgr.makeString("\\u")));
-    */
 
     // foreign variable: x vs y
     evaluateInModel(
