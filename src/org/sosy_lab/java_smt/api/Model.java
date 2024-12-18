@@ -11,10 +11,8 @@ package org.sosy_lab.java_smt.api;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 
 /**
  * This class provides a model with concrete evaluations for symbols and formulas from the
@@ -30,14 +28,13 @@ import org.sosy_lab.java_smt.api.Model.ValueAssignment;
  *       environment.
  * </ul>
  */
-public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseable {
+public interface Model extends Evaluator, AutoCloseable {
 
   /**
-   * Iterate over all values present in the model. Note that iterating multiple times may be
-   * inefficient for some solvers, it is recommended to use {@link
-   * BasicProverEnvironment#getModelAssignments()} instead in this case.
+   * Build a list of assignments for all values present in the model. The list stays valid after
+   * closing the model.
    *
-   * <p>The iteration includes value assignments for...
+   * <p>The list includes value assignments for...
    *
    * <ul>
    *   <li>all relevant free variables of simple type. If a variable is irrelevant for
@@ -50,16 +47,6 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
    *       Please use a direct evaluation query to get the evaluation in such a case.
    * </ul>
    */
-  @Override
-  default Iterator<ValueAssignment> iterator() {
-    try {
-      return asList().iterator();
-    } catch (InterruptedException | SolverException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  /** Build a list of assignments that stays valid after closing the model. */
   ImmutableList<ValueAssignment> asList() throws InterruptedException, SolverException;
 
   /**
@@ -77,7 +64,7 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
 
   /**
    * Free resources associated with this model (existing {@link ValueAssignment} instances stay
-   * valid, but {@link #evaluate(Formula)} etc. and {@link #iterator()} must not be called again).
+   * valid, but {@link #evaluate(Formula)} etc. must not be called again).
    */
   @Override
   void close();

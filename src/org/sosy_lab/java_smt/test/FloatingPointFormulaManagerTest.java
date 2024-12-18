@@ -954,7 +954,7 @@ public class FloatingPointFormulaManagerTest
         ValueAssignment nanAssignment =
             new ValueAssignment(nanVar, nan, nanEq, "nan", nanValue, ImmutableList.of());
 
-        assertThat(model).containsExactly(zeroAssignment, oneAssignment, nanAssignment);
+        assertThat(model.asList()).containsExactly(zeroAssignment, oneAssignment, nanAssignment);
       }
     }
   }
@@ -967,7 +967,7 @@ public class FloatingPointFormulaManagerTest
       assertThat(prover).isSatisfiable();
 
       try (Model model = prover.getModel()) {
-        assertThat(model).isEmpty();
+        assertThat(model.asList()).isEmpty();
 
         for (float f :
             new float[] {

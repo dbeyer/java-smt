@@ -217,7 +217,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
       return "Unknown reason.";
     } else {
       return String.format(
-          "Assertions use features %s that are not supported " + "by the specified logic %s.",
+          "Assertions use features %s that are not supported by the specified logic %s.",
           errors, creator.getLogic());
     }
   }

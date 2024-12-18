@@ -15,6 +15,7 @@ import static com.google.common.truth.TruthJUnit.assume;
 import com.google.common.collect.ImmutableMap;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -729,9 +730,16 @@ public class SolverConcurrencyTest {
     } finally {
       threadPool.shutdownNow();
     }
-    assertWithMessage("Test %s failed with exception(s): %s", testName, exceptionsList)
-        .that(exceptionsList.isEmpty())
-        .isTrue();
+    var exceptionMessages =
+        exceptionsList.stream()
+            .map(
+                ex ->
+                    String.format(
+                        "%s (%s): %s",
+                        ex.getClass(), ex.getMessage(), Arrays.toString(ex.getStackTrace())));
+    assertWithMessage("Test %s failed with exception(s): %s", testName, exceptionMessages)
+        .that(exceptionsList)
+        .isEmpty();
   }
 
   /** just a small lambda-compatible interface. */

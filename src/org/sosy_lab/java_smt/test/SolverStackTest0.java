@@ -326,7 +326,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
     stack.addConstraint(q1);
     assertThat(stack).isSatisfiable();
     Model m1 = stack.getModel();
-    assertThat(m1).isNotEmpty();
+    assertThat(m1.asList()).isNotEmpty();
     stack.pop();
     assertEquals(0, stack.size());
 
@@ -337,7 +337,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
     stack.addConstraint(q1);
     assertThat(stack).isSatisfiable();
     Model m2 = stack.getModel();
-    assertThat(m2).isNotEmpty();
+    assertThat(m2.asList()).isNotEmpty();
     stack.pop();
     assertEquals(0, stack.size());
   }

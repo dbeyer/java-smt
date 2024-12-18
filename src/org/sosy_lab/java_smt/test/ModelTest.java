@@ -94,7 +94,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        assertThat(m).isEmpty();
+        assertThat(m.asList()).isEmpty();
       }
 
       assertThat(prover.getModelAssignments()).isEmpty();
@@ -108,7 +108,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        assertThat(m).isEmpty();
+        assertThat(m.asList()).isEmpty();
       }
 
       assertThat(prover.getModelAssignments()).isEmpty();
@@ -412,7 +412,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       try (Model m = prover.getModel()) {
         assertThat(m.evaluate(app1)).isEqualTo(BigInteger.ONE);
         assertThat(m.evaluate(app2)).isEqualTo(BigInteger.valueOf(2));
-        assertThat(m).containsExactlyElementsIn(expectedModel);
+        assertThat(m.asList()).containsExactlyElementsIn(expectedModel);
       }
       assertThat(prover.getModelAssignments()).containsExactlyElementsIn(expectedModel);
     }
@@ -477,7 +477,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       try (Model m = prover.getModel()) {
         assertThat(m.evaluate(app1)).isEqualTo(BigInteger.ONE);
         assertThat(m.evaluate(app2)).isEqualTo(BigInteger.valueOf(2));
-        assertThat(m).containsExactlyElementsIn(expectedModel);
+        assertThat(m.asList()).containsExactlyElementsIn(expectedModel);
       }
       assertThat(prover.getModelAssignments()).containsExactlyElementsIn(expectedModel);
     }
@@ -565,7 +565,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       try (Model m = prover.getModel()) {
         assertThat(m.evaluate(app1)).isEqualTo(BigInteger.ONE);
         assertThat(m.evaluate(app2)).isEqualTo(BigInteger.valueOf(2));
-        assertThat(m).containsExactlyElementsIn(expectedModel);
+        assertThat(m.asList()).containsExactlyElementsIn(expectedModel);
       }
       assertThat(prover.getModelAssignments()).containsExactlyElementsIn(expectedModel);
     }
@@ -618,10 +618,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m.asList()) {
           // Check that we can iterate through with no crashes.
         }
-        assertThat(m).contains(expectedValueAssignment);
+        assertThat(m.asList()).contains(expectedValueAssignment);
       }
     }
   }
@@ -673,10 +673,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m.asList()) {
           // Check that we can iterate through with no crashes.
         }
-        assertThat(m).contains(expectedValueAssignment);
+        assertThat(m.asList()).contains(expectedValueAssignment);
       }
     }
   }
@@ -807,7 +807,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       assertThat(prover).isSatisfiable();
       try (Model m = prover.getModel()) {
         assertThat(m.evaluate(x)).isEqualTo(null);
-        assertThat(m).isEmpty();
+        assertThat(m.asList()).isEmpty();
       }
     }
   }
@@ -974,7 +974,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m.asList()) {
           // Check that we can iterate through with no crashes.
         }
         assertThat(m.evaluate(select1Store7in1)).isEqualTo(BigInteger.valueOf(7));
@@ -1029,7 +1029,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m.asList()) {
           // Check that we can iterate through with no crashes.
         }
         assertThat(m.evaluate(select1Store7in1)).isEqualTo(BigInteger.valueOf(7));
@@ -1058,7 +1058,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m.asList()) {
           // Check that we can iterate through with no crashes.
         }
         assertThat(m.evaluate(selected)).isEqualTo(BigInteger.ONE);
@@ -1100,7 +1100,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m.asList()) {
           // Check that we can iterate through with no crashes.
         }
         assertThat(m.evaluate(amgr.select(updated, bvmgr.makeBitvector(8, 1))))
@@ -1498,7 +1498,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m.asList()) {
           // Check that we can iterate through with no crashes.
         }
         assertThat(m.evaluate(selected)).isEqualTo(BigInteger.ZERO);
@@ -1543,7 +1543,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m.asList()) {
           // Check that we can iterate through with no crashes.
         }
         assertThat(m.evaluate(selectStore)).isEqualTo(BigInteger.valueOf(7));
@@ -1594,7 +1594,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m.asList()) {
           // Check that we can iterate through with no crashes.
         }
         if (m.evaluate(selected1).equals(BigInteger.valueOf(-1))) {
@@ -1615,10 +1615,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m.asList()) {
           // Check that we can iterate through with no crashes.
         }
-        assertThat(prover.getModelAssignments()).containsExactlyElementsIn(m).inOrder();
+        assertThat(prover.getModelAssignments()).containsExactlyElementsIn(m.asList()).inOrder();
       }
     }
   }
@@ -1661,7 +1661,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       try (Model m = prover.getModel()) {
         assertThat(m.evaluate(variable)).isEqualTo(expectedValue);
 
-        for (ValueAssignment va : m) {
+        for (ValueAssignment va : m.asList()) {
           modelAssignments.add(va.getAssignmentAsFormula());
         }
 
@@ -1784,10 +1784,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       prover.push(f);
       assertThat(prover.isUnsat()).isFalse();
       try (Model m = prover.getModel()) {
-        for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
+        for (@SuppressWarnings("unused") ValueAssignment assignment : m.asList()) {
           // Check that we can iterate through with no crashes.
         }
-        assertThat(prover.getModelAssignments()).containsExactlyElementsIn(m).inOrder();
+        assertThat(prover.getModelAssignments()).containsExactlyElementsIn(m.asList()).inOrder();
 
         assignments = prover.getModelAssignments();
       }
@@ -1867,7 +1867,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       prover.push(qmgr.exists(ctr, body));
       assertThat(prover.isUnsat()).isFalse();
       try (Model m = prover.getModel()) {
-        for (ValueAssignment v : m) {
+        for (ValueAssignment v : m.asList()) {
           // a value-assignment might have a different name, but the value should be "0".
           assertThat(BigInteger.ZERO.equals(v.getValue())).isTrue();
         }
@@ -1878,7 +1878,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       prover.push(body);
       assertThat(prover.isUnsat()).isFalse();
       try (Model m = prover.getModel()) {
-        ValueAssignment v = m.iterator().next();
+        ValueAssignment v = m.asList().get(0);
         assertThat("x".equals(v.getName())).isTrue();
         assertThat(BigInteger.ZERO.equals(v.getValue())).isTrue();
       }

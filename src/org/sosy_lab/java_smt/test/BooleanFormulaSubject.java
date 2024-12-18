@@ -146,7 +146,7 @@ public final class BooleanFormulaSubject extends Subject {
         // check whether the model exists and we can iterate over it.
         // We allow an empty model, but it must be available.
         try (Model m = prover.getModel()) {
-          for (ValueAssignment v : m) {
+          for (ValueAssignment v : m.asList()) {
             // ignore, we just check iteration
           }
         }
