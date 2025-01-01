@@ -38,7 +38,7 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
               + "((?<codePoint>[0-9a-fA-F]{4})"
               + "|"
               // or curly brackets like "\\u{61}"
-              + "(\\{(?<codePointInBrackets>[0-9a-fA-F]{1,5})}))");
+              + "(\\{(?<codePointInBrackets>[0-9a-fA-F]{1,5})\\}))");
 
   protected AbstractStringFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
