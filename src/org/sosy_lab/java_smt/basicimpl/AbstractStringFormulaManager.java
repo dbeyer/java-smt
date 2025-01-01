@@ -104,7 +104,13 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
       checkArgument(
           isCodePointInRange(codePoint),
           "SMTLIB does only specify Unicode letters from Planes 0-2");
-      matcher.appendReplacement(sb, Character.toString(codePoint));
+      String replacement = Character.toString(codePoint);
+      if (replacement.equals("\\")) {
+        // Matcher.appendReplacement considers '\' as special character.
+        // Substitute with '\\' instead
+        replacement = "\\\\";
+      }
+      matcher.appendReplacement(sb, replacement);
     }
     matcher.appendTail(sb);
     return sb.toString();
