@@ -24,7 +24,7 @@ RUN apt-get update \
 # CVC5 requires some dependencies
 RUN apt-get update \
  && apt-get install -y \
-        python3 python3-toml python3-pyparsing flex libssl-dev \
+        python3.10 python3.10-venv python3-toml python3-pyparsing flex libssl-dev cmake \
  && wget https://github.com/Kitware/CMake/releases/download/v3.26.3/cmake-3.26.3.tar.gz \
  && tar -zxvf cmake-3.26.3.tar.gz \
  && cd cmake-3.26.3 \
@@ -66,15 +66,6 @@ RUN wget https://gmplib.org/download/gmp/gmp-6.2.1.tar.lz \
  && make -j4 \
  && make install \
  && cd --
-
-# Add the user "developer" with UID:1000, GID:1000, home at /developer.
-# This allows to map the docker-internal user to the local user 1000:1000 outside of the container.
-# This avoids to have new files created with root-rights.
-RUN groupadd -r developer -g 1000 \
- && useradd -u 1000 -r -g developer -m -d /developer -s /sbin/nologin -c "JavaSMT Development User" developer \
- && chmod 755 /developer
-
-USER developer
 
 # JNI is not found when compiling Boolector in the image, so we need to set JAVA_HOME
 ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
