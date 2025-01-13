@@ -43,8 +43,7 @@ import ap.terfor.preds.Predicate;
 import ap.theories.arrays.ExtArray;
 import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.nia.GroebnerMultiplication$;
-import ap.theories.rationals.Fractions;
-import ap.theories.rationals.Rationals$;
+import ap.theories.rationals.Rationals;
 import ap.types.Sort;
 import ap.types.Sort$;
 import com.google.common.base.Preconditions;
@@ -52,7 +51,6 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Table;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -213,15 +211,13 @@ class PrincessFormulaCreator
         case "mod_cast":
           // we found a bitvector BV(lower, upper, ctxt), lets extract the last parameter
           return ((IIntLit) fun.apply(2)).value().bigIntValue();
-        case "_int":
-        case "Rat_int":
+        case "Rat_fromRing":
           Preconditions.checkArgument(fun.fun().arity() == 1);
           ITerm term = fun.apply(0);
           if (term instanceof IIntLit) {
             return ((IIntLit) term).value().bigIntValue();
           }
           break;
-        case "_frac":
         case "Rat_frac":
           Preconditions.checkArgument(fun.fun().arity() == 2);
           ITerm term1 = fun.apply(0);
@@ -367,19 +363,12 @@ class PrincessFormulaCreator
 
   /** Returns true if the expression is an integer literal. */
   private static boolean isRatInt(IFunApp pExpr) {
-    // We need to use reflection to get Rationals.int() as `int` can't be a method name in Java
-    final IFunction ratInt;
-    try {
-      ratInt = (IFunction) Fractions.class.getMethod("int").invoke(Rationals$.MODULE$);
-    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException ex) {
-      throw new RuntimeException(ex);
-    }
-    return isConstant(pExpr) && pExpr.fun().equals(ratInt);
+    return isConstant(pExpr) && pExpr.fun().equals(Rationals.fromRing());
   }
 
   /** Returns true if the expression is a faction literal. */
   private static boolean isRatFrac(IFunApp pExpr) {
-    return isConstant(pExpr) && pExpr.fun().equals(Rationals$.MODULE$.frac());
+    return isConstant(pExpr) && pExpr.fun().equals(Rationals.frac());
   }
 
   @Override

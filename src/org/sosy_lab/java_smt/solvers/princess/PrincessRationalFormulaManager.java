@@ -42,11 +42,10 @@ public class PrincessRationalFormulaManager
     if (value instanceof IFunApp) {
       IFunApp fun = (IFunApp) value;
       switch (fun.fun().name()) {
-        case "int":
-        case "Rat_int":
+        case "Rat_fromRing":
           assert fun.fun().arity() == 1;
           return ifmgr.isNumeral(fun.apply(0));
-        case "frac":
+        case "Rat_frac":
           assert fun.fun().arity() == 2;
           return ifmgr.isNumeral(fun.apply(0)) && ifmgr.isNumeral(fun.apply(1));
       }
@@ -70,7 +69,10 @@ public class PrincessRationalFormulaManager
 
   @Override
   protected IExpression makeNumberImpl(Rational pI) {
-    return divide(makeNumberImpl(pI.getNum()), makeNumberImpl(pI.getDen()));
+    return new IFunApp(
+        Rationals.frac(),
+        PrincessEnvironment.toITermSeq(
+            ifmgr.makeNumberImpl(pI.getNum()), ifmgr.makeNumberImpl(pI.getDen())));
   }
 
   @Override
