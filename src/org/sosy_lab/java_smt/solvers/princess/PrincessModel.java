@@ -22,9 +22,7 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.IIntLit;
-import ap.parser.IPlus;
 import ap.parser.ITerm;
-import ap.parser.ITimes;
 import ap.terfor.preds.Predicate;
 import ap.theories.arrays.ExtArray;
 import ap.theories.arrays.ExtArray.ArraySort;
@@ -249,24 +247,6 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
     return model.toString();
   }
 
-  /** Tries to determine the Sort of a Term. */
-  private Sort getSort(IExpression pTerm) {
-    // Just using sortof() won't work as Princess may have simplified the original term
-    // FIXME: This may also affect other parts of the code that use sortof()
-    if (pTerm instanceof ITimes) {
-      ITimes times = (ITimes) pTerm;
-      return getSort(times.subterm());
-    } else if (pTerm instanceof IPlus) {
-      IPlus plus = (IPlus) pTerm;
-      return getSort(plus.apply(0));
-    } else if (pTerm instanceof IFormula) {
-      return creator.getBoolType();
-    } else {
-      // TODO: Do we need more cases?
-      return Sort$.MODULE$.sortOf((ITerm) pTerm);
-    }
-  }
-
   /**
    * Simplify rational values.
    *
@@ -301,7 +281,8 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
 
     if (expr instanceof ITerm) {
       ITerm term = (ITerm) expr;
-      ITerm var = api.createConstant(newVariable, getSort(term));
+      Sort sort = Sort$.MODULE$.sortOf(term);
+      ITerm var = api.createConstant(newVariable, sort);
       api.addAssertion(var.$eq$eq$eq(term));
       api.checkSat(true);
       ITerm value = simplifyRational(api.evalToTerm(var));
