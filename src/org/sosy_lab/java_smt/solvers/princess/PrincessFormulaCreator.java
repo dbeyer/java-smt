@@ -579,6 +579,12 @@ class PrincessFormulaCreator
         return FunctionDeclarationKind.OTHER;
       } else if (fun == ModuloArithmetic.int_cast()) {
         return FunctionDeclarationKind.OTHER;
+      } else if (fun == Rationals.addition()) {
+        return FunctionDeclarationKind.ADD;
+      } else if (fun == Rationals.multiplication()) {
+        return FunctionDeclarationKind.MUL;
+      } else if (fun == Rationals.division()) {
+        return FunctionDeclarationKind.DIV;
       } else {
         return FunctionDeclarationKind.UF;
       }
