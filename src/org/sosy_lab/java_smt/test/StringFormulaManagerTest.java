@@ -1640,7 +1640,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
         .isNotEqualTo(Solvers.Z3);
 
     for (int i = 0; i < WORDS.size(); i++) {
-      for (int j = 1; j < WORDS.size(); j++) {
+      for (int j = 0; j < WORDS.size(); j++) {
         String word1 = WORDS.get(i);
         String word2 = WORDS.get(j);
         String word3 = "replacement";
@@ -1648,7 +1648,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
         StringFormula word2F = smgr.makeString(word2);
         StringFormula word3F = smgr.makeString(word3);
 
-        StringFormula result = smgr.makeString(word3.replaceAll(word2, word1));
+        StringFormula result =
+            smgr.makeString(word2.isEmpty() ? word3 : word3.replaceAll(word2, word1));
         assertEqual(smgr.replaceAll(word3F, word2F, word1F), result);
       }
     }
