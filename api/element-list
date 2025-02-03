@@ -1,0 +1,14 @@
+org.sosy_lab.java_smt
+org.sosy_lab.java_smt.api
+org.sosy_lab.java_smt.api.visitors
+org.sosy_lab.java_smt.basicimpl
+org.sosy_lab.java_smt.basicimpl.tactics
+org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper
+org.sosy_lab.java_smt.delegate.debugging
+org.sosy_lab.java_smt.delegate.logging
+org.sosy_lab.java_smt.delegate.statistics
+org.sosy_lab.java_smt.delegate.synchronize
+org.sosy_lab.java_smt.example
+org.sosy_lab.java_smt.example.nqueens_user_propagator
+org.sosy_lab.java_smt.test
+org.sosy_lab.java_smt.utils
