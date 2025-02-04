@@ -188,6 +188,14 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   (*jenv)->ReleaseLongArrayElements(jenv, arg##num, m_arg##num, 0); \
   out##num:
 
+#define INT_INIT \
+  int retval = -1;
+
+#define TERM_VECTOR_ARG_INIT INT_INIT
+
+#define POINTER_INIT(type) \
+  type* retval = NULL;
+
 //may cause memory leak through yices_error_string
 #define INT_RETURN \
   if (retval <= 0 && yices_error_code() != 0){ \
@@ -305,7 +313,7 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   int yval[2]; \
   yval[0] = s_arg##num.node_id; \
   yval[1] = s_arg##num.node_tag; \
-  jintArray jretval; \
+  jintArray jretval = 0; \
   if (!(*jenv)->ExceptionCheck(jenv)) { \
     jretval = (*jenv)->NewIntArray(jenv, 2); \
     if(jretval != NULL){ \
@@ -418,11 +426,13 @@ typedef jlong jjparam;
 typedef jint jjterm;
 #define TERM_ARG(num) SIMPLE_ARG(term_t, num)
 #define TERM_ARG_VOID(num) SIMPLE_ARG(term_t, num)
+#define TERM_INIT INT_INIT
 #define TERM_RETURN INT_RETURN
 
 typedef jlong jjmodel;
 #define MODEL_ARG(num) POINTER_ARG(model_t, num)
 #define MODEL_ARG_VOID(num) POINTER_ARG(model_t, num)
+#define MODEL_INIT POINTER_INIT(model_t)
 #define MODEL_RETURN POINTER_RETURN
 //For things like model_t **
 #define MODEL_ARG_POINTER(num) POINTER_POINTER_ARG(model_t, num)
@@ -434,6 +444,7 @@ typedef jintArray jjtermArray;
 
 typedef jint jjtype;
 #define TYPE_ARG(num) SIMPLE_ARG(type_t, num)
+#define TYPE_INIT INT_INIT
 #define TYPE_RETURN INT_RETURN
 
 typedef jintArray jjtypeArray;

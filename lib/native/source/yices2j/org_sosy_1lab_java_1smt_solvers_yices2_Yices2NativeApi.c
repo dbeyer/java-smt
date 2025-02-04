@@ -60,17 +60,19 @@ VOID_CALL1(free_config)
 
 DEFINE_FUNC(int, 1set_1config) WITH_THREE_ARGS(jconf, string, string)
 CONF_ARG(1)
+INT_INIT
 STRING_ARG(2)
 STRING_ARG(3)
-CALL3(int, set_config)
+CALL3(, set_config)
 FREE_STRING_ARG(2)
 FREE_STRING_ARG(3)
 INT_RETURN
 
 DEFINE_FUNC(int, 1default_1config_1for_1logic) WITH_TWO_ARGS(jconf, string)
 CONF_ARG(1)
+INT_INIT
 STRING_ARG(2)
-CALL2(int, default_config_for_logic)
+CALL2(, default_config_for_logic)
 FREE_STRING_ARG(2)
 INT_RETURN
 
@@ -95,15 +97,17 @@ VOID_CALL1(free_context)
 
 DEFINE_FUNC(int, 1context_1enable_1option) WITH_TWO_ARGS(jctx, string)
 CTX_ARG(1)
+INT_INIT
 STRING_ARG(2)
-CALL2(int, context_enable_option)
+CALL2(, context_enable_option)
 FREE_STRING_ARG(2)
 INT_RETURN
 
 DEFINE_FUNC(int, 1context_1disable_1option) WITH_TWO_ARGS(jctx, string)
 CTX_ARG(1)
+INT_INIT
 STRING_ARG(2)
-CALL2(int, context_disable_option)
+CALL2(, context_disable_option)
 FREE_STRING_ARG(2)
 INT_RETURN
 
@@ -117,9 +121,10 @@ PARAM_RETURN
 
 DEFINE_FUNC(int, 1set_1param) WITH_THREE_ARGS(jparam, string, string)
 PARAM_ARG(1)
+INT_INIT
 STRING_ARG(2)
 STRING_ARG(3)
-CALL3(int, set_param)
+CALL3(, set_param)
 FREE_STRING_ARG(2)
 FREE_STRING_ARG(3)
 INT_RETURN
@@ -162,9 +167,10 @@ TYPE_RETURN
 
 DEFINE_FUNC(jtype, 1function_1type) WITH_THREE_ARGS(int, jtypeArray, jtype)
 UINT32_ARG(1)
+TYPE_INIT
 TYPE_ARRAY_ARG(2)
 TYPE_ARG(3)
-CALL3(type_t, function_type)
+CALL3(, function_type)
 FREE_TYPE_ARRAY_ARG(2)
 TYPE_RETURN
 
@@ -269,16 +275,18 @@ TERM_RETURN
 
 DEFINE_FUNC(jterm, 1distinct) WITH_TWO_ARGS(int, jtermArray)
 UINT32_ARG(1)
+TERM_INIT
 TERM_ARRAY_ARG(2)
-CALL2(term_t, distinct)
+CALL2(, distinct)
 FREE_TERM_ARRAY_ARG(2)
 TERM_RETURN
 
 DEFINE_FUNC(jterm, 1application) WITH_THREE_ARGS(jterm, int, jtermArray)
 TERM_ARG(1)
 UINT32_ARG(2)
+TERM_INIT
 TERM_ARRAY_ARG(3)
-CALL3(term_t, application)
+CALL3(, application)
 FREE_TERM_ARRAY_ARG(3)
 TERM_RETURN
 
@@ -289,9 +297,10 @@ TERM_RETURN
 DEFINE_FUNC(jterm, 1update) WITH_FOUR_ARGS(jterm, int, jtermArray, jterm)
 TERM_ARG(1)
 UINT32_ARG(2)
+TERM_INIT
 TERM_ARRAY_ARG(3)
 TERM_ARG(4)
-CALL4(term_t, update)
+CALL4(, update)
 FREE_TERM_ARRAY_ARG(3)
 TERM_RETURN
 
@@ -299,25 +308,28 @@ TERM_RETURN
 
 DEFINE_FUNC(jterm, 1forall) WITH_THREE_ARGS(int, jtermArray, jterm)
 UINT32_ARG(1)
+TERM_INIT
 TERM_ARRAY_ARG(2)
 TERM_ARG(3)
-CALL3(term_t, forall)
+CALL3(, forall)
 FREE_TERM_ARRAY_ARG(2)
 TERM_RETURN
 
 DEFINE_FUNC(jterm, 1exists) WITH_THREE_ARGS(int, jtermArray, jterm)
 UINT32_ARG(1)
+TERM_INIT
 TERM_ARRAY_ARG(2)
 TERM_ARG(3)
-CALL3(term_t, exists)
+CALL3(, exists)
 FREE_TERM_ARRAY_ARG(2)
 TERM_RETURN
 
 DEFINE_FUNC(jterm, 1lambda) WITH_THREE_ARGS(int, jtermArray, jterm)
 UINT32_ARG(1)
+TERM_INIT
 TERM_ARRAY_ARG(2)
 TERM_ARG(3)
-CALL3(term_t, lambda)
+CALL3(, lambda)
 FREE_TERM_ARRAY_ARG(2)
 TERM_RETURN
 
@@ -340,8 +352,9 @@ TERM_RETURN
 
 DEFINE_FUNC(jterm, 1and) WITH_TWO_ARGS(int, jtermArray)
 UINT32_ARG(1)
+TERM_INIT
 TERM_ARRAY_ARG(2)
-CALL2(term_t, and)
+CALL2(, and)
 FREE_TERM_ARRAY_ARG(2)
 TERM_RETURN
 
@@ -360,8 +373,9 @@ TERM_RETURN
 
 DEFINE_FUNC(jterm, 1or) WITH_TWO_ARGS(int, jtermArray)
 UINT32_ARG(1)
+TERM_INIT
 TERM_ARRAY_ARG(2)
-CALL2(term_t, or)
+CALL2(, or)
 FREE_TERM_ARRAY_ARG(2)
 TERM_RETURN
 
@@ -380,8 +394,9 @@ TERM_RETURN
 
 DEFINE_FUNC(jterm, 1xor) WITH_TWO_ARGS(int, jtermArray)
 UINT32_ARG(1)
+TERM_INIT
 TERM_ARRAY_ARG(2)
-CALL2(term_t, xor)
+CALL2(, xor)
 FREE_TERM_ARRAY_ARG(2)
 TERM_RETURN
 
@@ -443,14 +458,16 @@ TERM_RETURN
 //skipping GMP functions
 
 DEFINE_FUNC(jterm, 1parse_1rational) WITH_ONE_ARG(string)
+TERM_INIT
 STRING_ARG(1)
-CALL1(term_t, parse_rational)
+CALL1(, parse_rational)
 FREE_STRING_ARG(1)
 TERM_RETURN
 
 DEFINE_FUNC(jterm, 1parse_1float) WITH_ONE_ARG(string)
+TERM_INIT
 STRING_ARG(1)
-CALL1(term_t, parse_float)
+CALL1(, parse_float)
 FREE_STRING_ARG(1)
 TERM_RETURN
 
@@ -496,34 +513,38 @@ TERM_RETURN
 
 DEFINE_FUNC(jterm, 1sum) WITH_TWO_ARGS(int, jtermArray)
 UINT32_ARG(1)
+TERM_INIT
 TERM_ARRAY_ARG(2)
-CALL2(term_t, sum)
+CALL2(, sum)
 FREE_TERM_ARRAY_ARG(2)
 TERM_RETURN
 
 DEFINE_FUNC(jterm, 1product) WITH_TWO_ARGS(int, jtermArray)
 UINT32_ARG(1)
+TERM_INIT
 TERM_ARRAY_ARG(2)
-CALL2(term_t, product)
+CALL2(, product)
 FREE_TERM_ARRAY_ARG(2)
 TERM_RETURN
 
 DEFINE_FUNC(jterm, 1poly_1int32) WITH_THREE_ARGS(int, intArray, jtermArray)
 UINT32_ARG(1)
+TERM_INIT
 INT_ARRAY_ARG(int32_t, 2)
 TERM_ARRAY_ARG(3)
-CALL3(term_t, poly_int32)
-FREE_INT_ARRAY_ARG(2)
+CALL3(, poly_int32)
 FREE_TERM_ARRAY_ARG(3)
+FREE_INT_ARRAY_ARG(2)
 TERM_RETURN
 
 DEFINE_FUNC(jterm, 1poly_1int64) WITH_THREE_ARGS(int, longArray, jtermArray)
 UINT32_ARG(1)
+TERM_INIT
 LONG_ARRAY_ARG(int64_t, 2)
 TERM_ARRAY_ARG(3)
-CALL3(term_t, poly_int64)
-FREE_LONG_ARRAY_ARG(2)
+CALL3(, poly_int64)
 FREE_TERM_ARRAY_ARG(3)
+FREE_LONG_ARRAY_ARG(2)
 TERM_RETURN
 
 //skipping poly_rational32()
@@ -637,20 +658,23 @@ TERM_RETURN
 
 DEFINE_FUNC(jterm, 1bvconst_1from_1array) WITH_TWO_ARGS(int, intArray)
 UINT32_ARG(1)
+TERM_INIT
 INT_ARRAY_ARG(int32_t, 2)
-CALL2(term_t, bvconst_from_array)
+CALL2(, bvconst_from_array)
 FREE_INT_ARRAY_ARG(2)
 TERM_RETURN
 
 DEFINE_FUNC(jterm, 1parse_1bvbin) WITH_ONE_ARG(string)
+TERM_INIT
 STRING_ARG(1)
-CALL1(term_t, parse_bvbin)
+CALL1(, parse_bvbin)
 FREE_STRING_ARG(1)
 TERM_RETURN
 
 DEFINE_FUNC(jterm, 1parse_1bvhex) WITH_ONE_ARG(string)
+TERM_INIT
 STRING_ARG(1)
-CALL1(term_t, parse_bvhex)
+CALL1(, parse_bvhex)
 FREE_STRING_ARG(1)
 TERM_RETURN
 
@@ -690,15 +714,17 @@ TERM_RETURN
 
 DEFINE_FUNC(jterm, 1bvsum) WITH_TWO_ARGS(int, jtermArray)
 UINT32_ARG(1)
+TERM_INIT
 TERM_ARRAY_ARG(2)
-CALL2(term_t, bvsum)
+CALL2(, bvsum)
 FREE_TERM_ARRAY_ARG(2)
 TERM_RETURN
 
 DEFINE_FUNC(jterm, 1bvproduct) WITH_TWO_ARGS(int, jtermArray)
 UINT32_ARG(1)
+TERM_INIT
 TERM_ARRAY_ARG(2)
-CALL2(term_t, bvproduct)
+CALL2(, bvproduct)
 FREE_TERM_ARRAY_ARG(2)
 TERM_RETURN
 
@@ -739,8 +765,9 @@ TERM_RETURN
 
 DEFINE_FUNC(jterm, 1bvand) WITH_TWO_ARGS(int, jtermArray)
 UINT32_ARG(1)
+TERM_INIT
 TERM_ARRAY_ARG(2)
-CALL2(term_t, bvand)
+CALL2(, bvand)
 FREE_TERM_ARRAY_ARG(2)
 TERM_RETURN
 
@@ -759,8 +786,9 @@ TERM_RETURN
 
 DEFINE_FUNC(jterm, 1bvor) WITH_TWO_ARGS(int, jtermArray)
 UINT32_ARG(1)
+TERM_INIT
 TERM_ARRAY_ARG(2)
-CALL2(term_t, bvor)
+CALL2(, bvor)
 FREE_TERM_ARRAY_ARG(2)
 TERM_RETURN
 
@@ -779,8 +807,9 @@ TERM_RETURN
 
 DEFINE_FUNC(jterm, 1bvxor) WITH_TWO_ARGS(int, jtermArray)
 UINT32_ARG(1)
+TERM_INIT
 TERM_ARRAY_ARG(2)
-CALL2(term_t, bvxor)
+CALL2(, bvxor)
 FREE_TERM_ARRAY_ARG(2)
 TERM_RETURN
 
@@ -890,8 +919,9 @@ TERM_RETURN
 
 DEFINE_FUNC(jterm, 1bvconcat) WITH_TWO_ARGS(int, jtermArray)
 UINT32_ARG(1)
+TERM_INIT
 TERM_ARRAY_ARG(2)
-CALL2(term_t, bvconcat)
+CALL2(, bvconcat)
 FREE_TERM_ARRAY_ARG(2)
 TERM_RETURN
 
@@ -937,8 +967,9 @@ TERM_RETURN
 
 DEFINE_FUNC(jterm, 1bvarray) WITH_TWO_ARGS(int, jtermArray)
 UINT32_ARG(1)
+TERM_INIT
 TERM_ARRAY_ARG(2)
-CALL2(term_t, bvarray)
+CALL2(, bvarray)
 FREE_TERM_ARRAY_ARG(2)
 TERM_RETURN
 
@@ -1101,6 +1132,7 @@ MPQ_ARG(3)
 term_t s_arg4;
 term_t *m_arg4 = &s_arg4;
 CALL4(int, sum_component)
+jobjectArray jretval = NULL;
 if (retval == -1) {
   const char *msg = yices_error_string();
   throwException(jenv, "java/lang/IllegalArgumentException", msg);
@@ -1112,7 +1144,6 @@ if ((*jenv)->ExceptionCheck(jenv)) {
    goto out;
 }
 jclass stringClass = (*jenv)->FindClass(jenv,"java/lang/String");
-jobjectArray jretval = NULL;
 jretval = (jobjectArray)(*jenv)->NewObjectArray(jenv, 2,stringClass,(*jenv)->NewStringUTF(jenv, ""));
 if (jretval != NULL) {
   (*jenv)->SetObjectArrayElement(jenv, jretval, 0, (*jenv)->NewStringUTF(jenv, mpqString));
@@ -1201,8 +1232,9 @@ INT_RETURN
 DEFINE_FUNC(int, 1assert_1formulas) WITH_THREE_ARGS(jctx, int, jtermArray)
 CTX_ARG(1)
 UINT32_ARG(2)
+INT_INIT
 TERM_ARRAY_ARG(3)
-CALL3(int, assert_formulas)
+CALL3(, assert_formulas)
 FREE_TERM_ARRAY_ARG(3)
 INT_RETURN
 
@@ -1239,15 +1271,17 @@ DEFINE_FUNC(int, 1check_1context_1with_1assumptions) WITH_FOUR_ARGS (jctx, jpara
 CTX_ARG(1)
 PARAM_ARG(2)
 UINT32_ARG(3)
+INT_INIT
 TERM_ARRAY_ARG(4)
-CALL4(smt_status_t, check_context_with_assumptions)
+CALL4(, check_context_with_assumptions)
 FREE_TERM_ARRAY_ARG(4)
 INT_RETURN
 
 DEFINE_FUNC(jtermArray, 1get_1unsat_1core) WITH_ONE_ARG(jctx)
 CTX_ARG(1)
+TERM_VECTOR_ARG_INIT
 TERM_VECTOR_ARG(2)
-CALL2(int, get_unsat_core)
+CALL2(, get_unsat_core)
 TERM_VECTOR_ARG_RETURN(2)
 
 /*
@@ -1262,11 +1296,12 @@ MODEL_RETURN
 
 DEFINE_FUNC(jmodel, 1model_1from_1map) WITH_THREE_ARGS(int ,jtermArray, jtermArray)
 UINT32_ARG(1)
+MODEL_INIT
 TERM_ARRAY_ARG(2)
 TERM_ARRAY_ARG(3)
-CALL3(model_t *, model_from_map)
-FREE_TERM_ARRAY_ARG(2)
+CALL3(, model_from_map)
 FREE_TERM_ARRAY_ARG(3)
+FREE_TERM_ARRAY_ARG(2)
 MODEL_RETURN
 
 //1model_1collect_1defined_1terms
@@ -1275,7 +1310,7 @@ DEFINE_FUNC(jtermArray, 1def_1terms) WITH_ONE_ARG(jmodel)
 MODEL_ARG(1)
 TERM_VECTOR_ARG(2)
 VOID_CALL2_WITH_RETURN(model_collect_defined_terms)
-int retval = 0; //declare retval for TERM_VECTOR_ARG_RETURN
+TERM_VECTOR_ARG_INIT //declare retval for TERM_VECTOR_ARG_RETURN
 TERM_VECTOR_ARG_RETURN(2)
 
 //yices_exit includes free_model()
@@ -1339,8 +1374,9 @@ INT_RETURN
 DEFINE_FUNC(int, 1formulas_1true_1in_1model) WITH_THREE_ARGS(jmodel, int, jtermArray)
 MODEL_ARG(1)
 UINT32_ARG(2)
+INT_INIT
 TERM_ARRAY_ARG(3)
-CALL3(int, formulas_true_in_model)
+CALL3(, formulas_true_in_model)
 FREE_TERM_ARRAY_ARG(3)
 INT_RETURN
 
@@ -1491,8 +1527,9 @@ TERM_RETURN
 
 DEFINE_FUNC(int, 1set_1term_1name) WITH_TWO_ARGS(jterm, string)
 TERM_ARG(1)
+INT_INIT
 STRING_ARG(2)
-CALL2(int, set_term_name)
+CALL2(, set_term_name)
 FREE_STRING_ARG(2)
 INT_RETURN
 
@@ -1502,8 +1539,9 @@ CALL1(const char *, get_term_name)
 CONST_STRING_RETURN
 
 DEFINE_FUNC(jterm, 1get_1term_1by_1name) WITH_ONE_ARG(string)
+TERM_INIT
 STRING_ARG(1)
-CALL1(term_t, get_term_by_name)
+CALL1(, get_term_by_name)
 FREE_STRING_ARG(1)
 TERM_RETURN
 
@@ -1512,19 +1550,21 @@ TERM_RETURN
 //skipping parse_type
 
 DEFINE_FUNC(jterm, 1parse_1term) WITH_ONE_ARG(string)
+TERM_INIT
 STRING_ARG(1)
-CALL1(term_t, parse_term)
+CALL1(, parse_term)
 FREE_STRING_ARG(1)
 TERM_RETURN
 
 DEFINE_FUNC(jterm, 1subst_1term) WITH_FOUR_ARGS(int, jtermArray, jtermArray, jterm)
 UINT32_ARG(1)
+TERM_INIT
 TERM_ARRAY_ARG(2)
 TERM_ARRAY_ARG(3)
 TERM_ARG(4)
-CALL4(term_t, subst_term)
-FREE_TERM_ARRAY_ARG(2)
+CALL4(, subst_term)
 FREE_TERM_ARRAY_ARG(3)
+FREE_TERM_ARRAY_ARG(2)
 TERM_RETURN
 
 /*
@@ -1604,10 +1644,11 @@ INT_RETURN
  */
 DEFINE_FUNC(int, 1check_1formula) WITH_FOUR_ARGS(jterm, string, jmodel, string)
 TERM_ARG(1)
+INT_INIT
 STRING_ARG(2)
 MODEL_ARG_POINTER(3)
 STRING_ARG(4)
-CALL4(smt_status_t, check_formula)
+CALL4(, check_formula)
 FREE_STRING_ARG(2)
 FREE_STRING_ARG(4)
 INT_RETURN
@@ -1617,12 +1658,13 @@ INT_RETURN
  * the conjunction of f[0] ... f[n-1] is satisfiable.
  */
 DEFINE_FUNC(int, 1check_1formulas) WITH_FIVE_ARGS(jtermArray, int, string, jmodel, string)
+INT_INIT
 TERM_ARRAY_ARG(1)
 UINT32_ARG(2)
 STRING_ARG(3)
 MODEL_ARG_POINTER(4)
 STRING_ARG(5)
-CALL5(smt_status_t, check_formulas)
+CALL5(, check_formulas)
 FREE_TERM_ARRAY_ARG(1)
 FREE_STRING_ARG(3)
 FREE_STRING_ARG(5)
@@ -1632,8 +1674,9 @@ INT_RETURN
  * Checks if the SAT-Solver entered as String is available
  */
 DEFINE_FUNC(int, 1has_1delegate) WITH_ONE_ARG(string)
+INT_INIT
 STRING_ARG(1)
-CALL1(int, has_delegate)
+CALL1(, has_delegate)
 FREE_STRING_ARG(1)
 INT_RETURN
 
@@ -1652,6 +1695,7 @@ TYPE_RETURN
 DEFINE_FUNC(jtermArray, 1model_1term_1support) WITH_TWO_ARGS(jmodel, jterm)
 MODEL_ARG(1)
 TERM_ARG(2)
+TERM_VECTOR_ARG_INIT
 TERM_VECTOR_ARG(3)
-CALL3(int, model_term_support)
+CALL3(, model_term_support)
 TERM_VECTOR_ARG_RETURN(3)
