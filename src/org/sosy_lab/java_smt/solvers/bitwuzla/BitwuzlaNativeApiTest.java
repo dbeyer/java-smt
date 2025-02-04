@@ -718,6 +718,16 @@ public class BitwuzlaNativeApiTest {
     return parser.bitwuzla().get_assertions();
   }
 
+  private Term parseVariable(String pName) {
+    return parse(String.format("(declare-const %s Bool)(assert %s)", pName, pName)).get(0);
+  }
+
+  private String dump(Term pTerm) {
+    Bitwuzla prover = new Bitwuzla(termManager, createOptions());
+    prover.assert_formula(pTerm);
+    return prover.print_formula();
+  }
+
   // Bitwuzla currently REWRITES terms when parsing
   @Ignore
   @Test
@@ -768,5 +778,90 @@ public class BitwuzlaNativeApiTest {
     // invalid/fails
     String badInput = "(declare-const a Bool)(assert (or a b))";
     parse(badInput);
+  }
+
+  @Test
+  public void noVariableCacheTest() {
+    // Bitwuzla allows us to create the same variable twice
+    // Here t1 and t2 are treated as different variables, even though they share a name and have
+    // the same sort
+    Sort sortBool = termManager.mk_bool_sort();
+    Term t1 = termManager.mk_const(sortBool, "var");
+    Term t2 = termManager.mk_const(sortBool, "var");
+
+    bitwuzla.assert_formula(termManager.mk_term(Kind.NOT, termManager.mk_term(Kind.IFF, t1, t2)));
+    assertThat(bitwuzla.check_sat()).isEqualTo(Result.SAT);
+
+    boolean r1 = bitwuzla.get_value(t1).is_true();
+    boolean r2 = bitwuzla.get_value(t2).is_true();
+    assertThat(r1).isNotEqualTo(r2);
+  }
+
+  @Test
+  public void quotedSymbolTest() {
+    // When parsing formulas Bitwuzla will preserve any || quotes in the name.
+    // The parser still makes sure that "var" and "|var|" can't be declared in the same file as
+    // both names are identical accoridng to the SMTLIB standard
+    assertThat(parseVariable("var").symbol()).isEqualTo("var");
+    assertThat(parseVariable("|var|").symbol()).isEqualTo("|var|");
+  }
+
+  @Test
+  @Ignore
+  public void illegalSmtlibTest() {
+    // Bitwuzla does not put reserved variable names in quotes while printing and will produce
+    // illegal output
+    Sort sortBool = termManager.mk_bool_sort();
+    Term t1 = termManager.mk_const(sortBool, "exit");
+
+    String expected =
+        "(set-logic ALL)\n"
+            + "(declare-const |exit| Bool)\n"
+            + "(assert |exit|)\n"
+            + "(check-sat)\n"
+            + "(exit)\n";
+    assertThat(dump(t1)).isEqualTo(expected);
+  }
+
+  @Test
+  @Ignore
+  public void illegalSmtlibParseTest() {
+    // Even with the quotes added Bitwuzla will not parse keywords
+    String input =
+        "(set-logic ALL)\n"
+            + "(declare-const |exit| Bool)\n"
+            + "(assert |exit|)\n"
+            + "(check-sat)\n"
+            + "(exit)\n";
+    assertThat(parse(input).get(0).symbol()).isEqualTo("|exit|");
+  }
+
+  @Test
+  @Ignore
+  public void illegalSmtlibNumberTest() {
+    // Bitwuzla also won't quote variable names that are numbers (like "1" or "1.4") while printing
+    Sort sortBool = termManager.mk_bool_sort();
+    Term t1 = termManager.mk_const(sortBool, "1");
+
+    String expected =
+        "(set-logic ALL)\n"
+            + "(declare-const |1| Bool)\n"
+            + "(assert |1|)\n"
+            + "(check-sat)\n"
+            + "(exit)\n";
+    assertThat(dump(t1)).isEqualTo(expected);
+  }
+
+  @Test
+  @Ignore
+  public void illegalSmtlibParseNumberTest() {
+    // Even though it can read back input with quoted numbers as variable names
+    String input =
+        "(set-logic ALL)\n"
+            + "(declare-const |1| Bool)\n"
+            + "(assert |1|)\n"
+            + "(check-sat)\n"
+            + "(exit)\n";
+    assertThat(parse(input).get(0).symbol()).isEqualTo("|1|");
   }
 }
