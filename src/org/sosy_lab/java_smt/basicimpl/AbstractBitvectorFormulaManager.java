@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -294,8 +293,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
   @Override
   public BitvectorFormula makeVariable(int pLength, String pVar) {
-    checkVariableName(pVar);
-    return wrap(makeVariableImpl(pLength, pVar));
+    return wrap(makeVariableImpl(pLength, FormulaCreator.escapeName(pVar)));
   }
 
   protected abstract TFormulaInfo makeVariableImpl(int pLength, String pVar);

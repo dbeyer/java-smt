@@ -10,16 +10,14 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.junit.Test;
@@ -34,154 +32,33 @@ import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.DefaultBooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
-import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
+import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-@SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
+// TODO Reduce the number of tests in this class.
+//  For variable name escaping we don't have to try every combination of Sort x Name. It should be
+//  enough to test the names once, and then check that escaping is applied for variables/ufs of all
+//  types.
+
 public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
-  private static final ImmutableList<String> NAMES =
-      ImmutableList.of(
-          "java-smt",
-          "JavaSMT",
-          "sosylab",
-          "test",
-          "foo",
-          "bar",
-          "baz",
-          "declare",
-          "exit",
-          "(exit)",
-          "!=",
-          "~",
-          ",",
-          ".",
-          ":",
-          " ",
-          "  ",
-          "(",
-          ")",
-          "[",
-          "]",
-          "{",
-          "}",
-          "[]",
-          "\"",
-          "\"\"",
-          "\"\"\"",
-          // TODO next line is disabled because of a problem in MathSAT5 (version 5.6.3).
-          // "'", "''", "'''",
-          "\n",
-          "\t",
-          "\u0000",
-          "\u0001",
-          "\u1234",
-          "\u2e80",
-          " this is a quoted symbol ",
-          " so is \n  this one ",
-          " \" can occur too ",
-          " af klj ^*0 asfe2 (&*)&(#^ $ > > >?\" ’]]984");
-
-  private static final ImmutableSet<String> FURTHER_SMTLIB2_KEYWORDS =
-      ImmutableSet.of(
-          "let",
-          "forall",
-          "exists",
-          "match",
-          "Bool",
-          "continued-execution",
-          "error",
-          "immediate-exit",
-          "incomplete",
-          "logic",
-          "memout",
-          "sat",
-          "success",
-          "theory",
-          "unknown",
-          "unsupported",
-          "unsat",
-          "_",
-          "as",
-          "BINARY",
-          "DECIMAL",
-          "HEXADECIMAL",
-          "NUMERAL",
-          "par",
-          "STRING",
-          "assert",
-          "check-sat",
-          "check-sat-assuming",
-          "declare-const",
-          "declare-datatype",
-          "declare-datatypes",
-          "declare-fun",
-          "declare-sort",
-          "define-fun",
-          "define-fun-rec",
-          "define-sort",
-          "echo",
-          "exit",
-          "get-assertions",
-          "get-assignment",
-          "get-info",
-          "get-model",
-          "get-option",
-          "get-proof",
-          "get-unsat-assumptions",
-          "get-unsat-core",
-          "get-value",
-          "pop",
-          "push",
-          "reset",
-          "reset-assertions",
-          "set-info",
-          "set-logic",
-          "set-option");
-
-  /**
-   * Some special chars are not allowed to appear in symbol names. See {@link
-   * AbstractFormulaManager#DISALLOWED_CHARACTERS}.
-   */
-  @SuppressWarnings("javadoc")
-  private static final ImmutableSet<String> UNSUPPORTED_NAMES =
-      ImmutableSet.of(
-          "|",
-          "||",
-          "|||",
-          "|test",
-          "|test|",
-          "t|e|s|t",
-          "\\",
-          "\\s",
-          "\\|\\|",
-          "| this is a quoted symbol |",
-          "| so is \n  this one |",
-          "| \" can occur too |",
-          "| af klj ^*0 asfe2 (&*)&(#^ $ > > >?\" ’]]984|");
-
-  protected List<String> getAllNames() {
-    return ImmutableList.<String>builder()
-        .addAll(NAMES)
-        .addAll(AbstractFormulaManager.BASIC_OPERATORS)
-        .addAll(AbstractFormulaManager.SMTLIB2_KEYWORDS)
-        .addAll(AbstractFormulaManager.DISALLOWED_CHARACTER_REPLACEMENT.values())
-        .addAll(FURTHER_SMTLIB2_KEYWORDS)
-        .addAll(UNSUPPORTED_NAMES)
-        .build();
-  }
-
-  boolean allowInvalidNames() {
-    return true;
+  static Set<String> getAllNames() {
+    ImmutableSet.Builder<String> builder = ImmutableSet.builder();
+    for (String symbol : ParserSymbolsEscapedTest.TEST_SYMBOLS) {
+      for (String variant :
+          ImmutableSet.of(
+              symbol,
+              ParserSymbolsEscapedTest.addQuotes(symbol),
+              FormulaCreator.escapeName(symbol),
+              ParserSymbolsEscapedTest.addQuotes(FormulaCreator.escapeName(symbol)))) {
+        builder.add(variant);
+      }
+    }
+    return builder.build();
   }
 
   @CanIgnoreReturnValue
   private <T extends Formula> T createVariableWith(Function<String, T> creator, String name) {
-    if (allowInvalidNames() && !mgr.isValidName(name)) {
-      assertThrows(IllegalArgumentException.class, () -> creator.apply(name));
-      return null;
-    } else {
-      return creator.apply(name);
-    }
+    return creator.apply(name);
   }
 
   private <T extends Formula> void testName0(
@@ -191,9 +68,6 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
 
     // create a variable
     T var = createVariableWith(creator, name);
-    if (var == null) {
-      return;
-    }
 
     // check whether it exists with the given name
     Map<String, Formula> map = mgr.extractVariables(var);
@@ -206,9 +80,6 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
 
     // check whether we can create the same variable again
     T var2 = createVariableWith(creator, name);
-    if (var2 == null) {
-      return;
-    }
 
     // for simple formulas, we can expect a direct equality
     // (for complex formulas this is not satisfied)
@@ -227,10 +98,8 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
     @SuppressWarnings("unused")
     String dump = mgr.dumpFormula(eq.apply(var, var)).toString();
 
-    if (allowInvalidNames()) {
-      // try to create a new (!) variable with a different name, the escaped previous name.
-      assertThat(createVariableWith(creator, "|" + name + "|")).isEqualTo(null);
-    }
+    // Adding SMTLIB quotes to the name should make it illegal
+    assertThat(mgr.isValidName(ParserSymbolsEscapedTest.addQuotes(name))).isFalse();
   }
 
   @Test
@@ -296,9 +165,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testNameBvArray() throws SolverException, InterruptedException {
     requireBitvectors();
     requireArrays();
-    // Someone who knows princess has to debug this!
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
-    for (String name : NAMES) {
+    for (String name : getAllNames()) {
       testName0(
           name,
           s ->
@@ -314,7 +181,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void testNameUF1Bool() throws SolverException, InterruptedException {
     requireIntegers();
-    for (String name : NAMES) {
+    for (String name : getAllNames()) {
       testName0(
           name,
           s -> fmgr.declareAndCallUF(s, BooleanType, imgr.makeNumber(0)),
@@ -326,7 +193,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void testNameUF1Int() throws SolverException, InterruptedException {
     requireIntegers();
-    for (String name : NAMES) {
+    for (String name : getAllNames()) {
       testName0(
           name, s -> fmgr.declareAndCallUF(s, IntegerType, imgr.makeNumber(0)), imgr::equal, true);
     }
@@ -335,8 +202,6 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void testNameUFBv() throws SolverException, InterruptedException {
     requireBitvectors();
-    // Someone who knows princess has to debug this!
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     for (String name : getAllNames()) {
       testName0(
           name,
@@ -350,7 +215,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testNameUF2Bool() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula zero = imgr.makeNumber(0);
-    for (String name : NAMES) {
+    for (String name : getAllNames()) {
       testName0(
           name, s -> fmgr.declareAndCallUF(s, BooleanType, zero, zero), bmgr::equivalence, true);
     }
@@ -360,7 +225,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testNameUF2Int() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula zero = imgr.makeNumber(0);
-    for (String name : NAMES) {
+    for (String name : getAllNames()) {
       testName0(name, s -> fmgr.declareAndCallUF(s, IntegerType, zero, zero), imgr::equal, true);
     }
   }
@@ -371,11 +236,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
     requireIntegers();
 
     for (String name : getAllNames()) {
-
       IntegerFormula var = createVariableWith(imgr::makeVariable, name);
-      if (var == null) {
-        continue;
-      }
       IntegerFormula zero = imgr.makeNumber(0);
       BooleanFormula eq = imgr.equal(var, zero);
       BooleanFormula exists = qmgr.exists(var, eq);
@@ -401,10 +262,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
                 Quantifier pQuantifier,
                 List<Formula> pBoundVariables,
                 BooleanFormula pBody) {
-              if (solverToUse() != Solvers.PRINCESS) {
-                // TODO Princess does not (yet) return quantified variables.
-                assertThat(pBoundVariables).hasSize(1);
-              }
+              assertThat(pBoundVariables).hasSize(1);
               for (Formula f : pBoundVariables) {
                 Map<String, Formula> map = mgr.extractVariables(f);
                 assertThat(map).hasSize(1);
@@ -427,11 +285,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
     requireIntegers();
 
     for (String name : getAllNames()) {
-
       IntegerFormula var1 = createVariableWith(imgr::makeVariable, name + 1);
-      if (var1 == null) {
-        continue;
-      }
       IntegerFormula var2 = createVariableWith(imgr::makeVariable, name + 2);
       IntegerFormula var3 = createVariableWith(imgr::makeVariable, name + 3);
       IntegerFormula var4 = createVariableWith(imgr::makeVariable, name + 4);
@@ -487,10 +341,8 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
                 Quantifier pQuantifier,
                 List<Formula> pBoundVariables,
                 BooleanFormula pBody) {
-              if (solverToUse() != Solvers.PRINCESS) {
-                // TODO Princess does not return quantified variables.
-                assertThat(pBoundVariables).hasSize(1);
-              }
+              assertThat(pBoundVariables).hasSize(1);
+              assertThat(pBoundVariables).hasSize(1);
               for (Formula f : pBoundVariables) {
                 Map<String, Formula> map = mgr.extractVariables(f);
                 assertThat(map).hasSize(1);
@@ -514,9 +366,6 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
 
     for (String name : getAllNames()) {
       BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
-      if (var == null) {
-        continue;
-      }
 
       bmgr.visit(
           var,
@@ -545,22 +394,17 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
     assume().that(solverToUse()).isNotEqualTo(Solvers.YICES2);
     for (String name : getAllNames()) {
       BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
-      if (var != null) {
-        @SuppressWarnings("unused")
-        String dump = mgr.dumpFormula(var).toString();
-      }
+      @SuppressWarnings("unused")
+      String dump = mgr.dumpFormula(var).toString();
     }
   }
 
   @Test
   public void testEqBoolVariableDump() {
-    // FIXME: Rewrite test? Most solvers will simplify the formula to `true`.
     for (String name : getAllNames()) {
       BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
-      if (var != null) {
-        @SuppressWarnings("unused")
-        String dump = mgr.dumpFormula(bmgr.equivalence(var, var)).toString();
-      }
+      @SuppressWarnings("unused")
+      String dump = mgr.dumpFormula(bmgr.equivalence(var, var)).toString();
     }
   }
 
@@ -610,8 +454,6 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testBvArrayVariable() {
     requireArrays();
     requireBitvectors();
-    // Someone who knows princess has to debug this!
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     for (String name : getAllNames()) {
       createVariableWith(
           v ->
@@ -626,13 +468,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void sameBehaviorTest() {
     for (String name : getAllNames()) {
-      if (mgr.isValidName(name)) {
-        // should pass without exception
-        AbstractFormulaManager.checkVariableName(name);
-      } else {
-        assertThrows(
-            IllegalArgumentException.class, () -> AbstractFormulaManager.checkVariableName(name));
-      }
+      assertThat(mgr.isValidName(name)).isEqualTo(FormulaCreator.isValidName(name));
     }
   }
 }

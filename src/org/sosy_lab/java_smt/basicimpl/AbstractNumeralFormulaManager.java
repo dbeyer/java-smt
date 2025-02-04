@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -171,8 +170,7 @@ public abstract class AbstractNumeralFormulaManager<
 
   @Override
   public ResultFormulaType makeVariable(String pVar) {
-    checkVariableName(pVar);
-    return wrap(makeVariableImpl(pVar));
+    return wrap(makeVariableImpl(FormulaCreator.escapeName(pVar)));
   }
 
   protected abstract TFormulaInfo makeVariableImpl(String i);

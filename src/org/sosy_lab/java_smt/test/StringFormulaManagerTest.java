@@ -265,10 +265,10 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     // FIXME: Princess will timeout on this test
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
 
-    // check whether "prefix + suffix == concat"
+    // check whether "prefix + suffix == concatenated"
     StringFormula prefix = smgr.makeVariable("prefix");
     StringFormula suffix = smgr.makeVariable("suffix");
-    StringFormula concat = smgr.makeVariable("concat");
+    StringFormula concat = smgr.makeVariable("concatenated");
 
     assertThatFormula(
             bmgr.and(

@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.collectionAsScalaIterableConverter;
 
@@ -82,6 +83,7 @@ import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import ostrich.OFlags;
 import ostrich.OstrichStringTheory;
 import scala.Tuple2;
@@ -322,6 +324,17 @@ class PrincessEnvironment {
     }
 
     final List<IFormula> formulas = asJava(parserResult._1());
+
+    // Check that all user defined function, constant and predicate symbols have valid names
+    for (IFunction f : asJava(parserResult._2().keySet())) {
+      checkArgument(FormulaCreator.isValidName(FormulaCreator.dequote(f.name())));
+    }
+    for (ConstantTerm c : asJava(parserResult._3()).keySet()) {
+      checkArgument(FormulaCreator.isValidName(FormulaCreator.dequote(c.name())));
+    }
+    for (Predicate p : asJava(parserResult._4()).keySet()) {
+      checkArgument(FormulaCreator.isValidName(FormulaCreator.dequote(p.name())));
+    }
 
     ImmutableSet.Builder<IExpression> declaredFunctions = ImmutableSet.builder();
     for (IExpression f : formulas) {

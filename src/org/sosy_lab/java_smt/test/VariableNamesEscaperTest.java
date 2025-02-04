@@ -10,26 +10,13 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.google.common.collect.Lists;
-import java.util.List;
 import org.junit.Test;
 
-/** inherits many tests from {@link VariableNamesTest}. */
-public class VariableNamesEscaperTest extends VariableNamesTest {
-
-  @Override
-  boolean allowInvalidNames() {
-    return false;
-  }
-
-  @Override
-  protected List<String> getAllNames() {
-    return Lists.transform(super.getAllNames(), mgr::escape);
-  }
+public class VariableNamesEscaperTest extends SolverBasedTest0 {
 
   @Test
   public void testEscapeUnescape() {
-    for (String var : getAllNames()) {
+    for (String var : VariableNamesTest.getAllNames()) {
       assertThat(mgr.unescape(mgr.escape(var))).isEqualTo(var);
       assertThat(mgr.unescape(mgr.unescape(mgr.escape(mgr.escape(var))))).isEqualTo(var);
     }
@@ -37,7 +24,7 @@ public class VariableNamesEscaperTest extends VariableNamesTest {
 
   @Test
   public void testDoubleEscapeUnescape() {
-    for (String var : getAllNames()) {
+    for (String var : VariableNamesTest.getAllNames()) {
       assertThat(mgr.unescape(mgr.escape(var))).isEqualTo(var);
       assertThat(mgr.unescape(mgr.unescape(mgr.escape(mgr.escape(var))))).isEqualTo(var);
     }

@@ -159,13 +159,6 @@ public class EnumerationFormulaManagerTest extends SolverBasedTest0.Parameterize
     assertThrows(IllegalArgumentException.class, () -> emgr.equivalence(blue, circle));
   }
 
-  @Test
-  public void testInvalidName() {
-    assertThrows(IllegalArgumentException.class, () -> emgr.declareEnumeration("true", "X", "Y"));
-    EnumerationFormulaType colorType = emgr.declareEnumeration("ColorE", "Blue", "White");
-    assertThrows(IllegalArgumentException.class, () -> emgr.makeVariable("true", colorType));
-  }
-
   private static class ConstantsVisitor extends DefaultFormulaVisitor<TraversalProcess> {
 
     final Set<String> constants = new HashSet<>();

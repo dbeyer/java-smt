@@ -244,22 +244,6 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     }
   }
 
-  @SuppressWarnings("CheckReturnValue")
-  @Test
-  public void testDeclareAndCallUFWithIntWithUnsupportedName() {
-    requireIntegers();
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            fmgr.declareAndCallUF(
-                "|Func|", FormulaType.IntegerType, ImmutableList.of(imgr.makeNumber(1))));
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            fmgr.declareUF(
-                "|Func|", FormulaType.IntegerType, ImmutableList.of(FormulaType.IntegerType)));
-  }
-
   @Test
   public void testDeclareAndCallUFWithBv() {
     requireBitvectors();
@@ -274,26 +258,6 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
       Formula f2 = mgr.makeApplication(declaration, bvmgr.makeBitvector(4, 1));
       Truth.assertThat(f2).isEqualTo(f);
     }
-  }
-
-  @Test
-  @SuppressWarnings("CheckReturnValue")
-  public void testDeclareAndCallUFWithBvWithUnsupportedName() {
-    requireBitvectors();
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            fmgr.declareAndCallUF(
-                "|Func|",
-                FormulaType.getBitvectorTypeWithSize(4),
-                ImmutableList.of(bvmgr.makeBitvector(4, 1))));
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            fmgr.declareUF(
-                "|Func|",
-                FormulaType.getBitvectorTypeWithSize(4),
-                ImmutableList.of(FormulaType.getBitvectorTypeWithSize(4))));
   }
 
   @Test

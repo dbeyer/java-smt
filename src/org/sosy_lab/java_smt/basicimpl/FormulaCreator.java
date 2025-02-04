@@ -11,6 +11,10 @@ package org.sosy_lab.java_smt.basicimpl;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.CharMatcher;
+import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -76,6 +80,179 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   private final @Nullable TType stringType;
   private final @Nullable TType regexType;
   protected final TEnv environment;
+
+  /**
+   * Avoid using escape characters of SMT-LIB2 as part of names for symbols.
+   *
+   * <p>We do not accept some names as identifiers for variables or UFs, because they easily
+   * misguide the user. Most solvers even would allow such identifiers directly, currently only
+   * SMTInterpol has problems with some of them. For consistency, we disallow those names for all
+   * solvers.
+   */
+  @VisibleForTesting
+  public static final ImmutableList<String> RESERVED =
+      ImmutableList.of(
+          // Keywords
+          "_",
+          "!",
+          "as",
+          "let",
+          "exists",
+          "forall",
+          "match",
+          "par",
+
+          // Commands
+          "assert",
+          "check-sat",
+          "check-sat-assuming",
+          "declare-const",
+          "declare-datatype",
+          "declare-datatypes",
+          "declare-fun",
+          "declare-sort",
+          "define-fun",
+          "define-fun-rec",
+          "define-funs-rec",
+          "define-sort",
+          "echo",
+          "exit",
+          "get-assertions",
+          "get-assignment",
+          "get-info",
+          "get-model",
+          "get-option",
+          "get-proof",
+          "get-unsat-assumptions",
+          "get-unsat-core",
+          "get-value",
+          "pop",
+          "push",
+          "reset",
+          "reset-assertions",
+          "set-info",
+          "set-logic",
+          "set-option",
+
+          // Predefined symbols
+          // Arrays
+          "select",
+          "store",
+          "const",
+
+          // Bitvectors
+          "concat",
+          "extract",
+          "zero_extend",
+          "sign_extend",
+          "rotate_left",
+          "rotate_right",
+          "bv2int",
+          "int2bv",
+          "bvadd",
+          "bvsub",
+          "bvneg",
+          "bvmul",
+          "bvudiv",
+          "bvsdiv",
+          "bvurem",
+          "bvsrem",
+          "bvsmod",
+          "bvshl",
+          "bvlshr",
+          "bvashr",
+          "bvor",
+          "bvand",
+          "bvnot",
+          "bvxor",
+          "bvule",
+          "bvult",
+          "bvuge",
+          "bvugt",
+          "bvsle",
+          "bvslt",
+          "bvsge",
+          "bvsgt",
+
+          // Core
+          "true",
+          "false",
+          "not",
+          "=>",
+          "and",
+          "or",
+          "xor",
+          "=",
+          "distinct",
+          "ite",
+
+          // Floats
+          "roundNearestTiesToEven RoundingMode",
+          "roundNearestTiesToAway",
+          "roundTowardPositive",
+          "roundTowardNegative",
+          "roundTowardZero",
+          "RNE",
+          "RNA",
+          "RTP",
+          "RTN",
+          "RTZ",
+          "fp",
+          "+oo",
+          "-oo",
+          "+zero",
+          "-zero",
+          "NaN",
+          "to_fp",
+          "to_fp_unsigned",
+          // + any symbol starting with "fp."
+
+          // Integers and Reals
+          "-",
+          "~",
+          "+",
+          "*",
+          "div",
+          "mod",
+          "/",
+          "abs",
+          "<=",
+          "<",
+          ">=",
+          ">",
+          "divisible",
+          "to_real",
+          "to_int",
+          "is_int"
+
+          // Strings
+          // + any symbol starting with "str."
+          // + any symbol starting with "re."
+          );
+
+  /**
+   * Avoid using escape characters of SMT-LIB2 as part of names for symbols.
+   *
+   * <p>We do not accept some names as identifiers for variables or UFs, because they easily
+   * misguide the user. Most solvers even would allow such identifiers directly, currently only
+   * SMTInterpol has problems with some of them. For consistency, we disallow those names for all
+   * solvers.
+   */
+  @VisibleForTesting
+  public static final CharMatcher DISALLOWED_CHARACTERS = CharMatcher.anyOf("|\\,");
+
+  /**
+   * Mapping of disallowed char to their escaped counterparts.
+   *
+   * <p>Keep this map in sync with {@link #DISALLOWED_CHARACTERS}. Counterparts can be any unique
+   * string. For optimization, we could even use plain chars.
+   */
+  @VisibleForTesting
+  public static final ImmutableBiMap<Character, String> DISALLOWED_CHARACTER_REPLACEMENT =
+      ImmutableBiMap.of('|', "pipe", '\\', "backslash", ',', "comma");
+
+  @VisibleForTesting
+  public static final char ESCAPE = '$'; // just some allowed symbol, can be any char
 
   protected FormulaCreator(
       TEnv env,
@@ -287,6 +464,52 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   }
 
   public abstract FormulaType<?> getFormulaType(TFormulaInfo formula);
+
+  static class SymbolViewVisitor<R> implements FormulaVisitor<R> {
+    private final FormulaVisitor<R> delegate;
+
+    SymbolViewVisitor(FormulaVisitor<R> pDelegate) {
+      delegate = pDelegate;
+    }
+
+    @Override
+    public R visitFreeVariable(Formula f, String name) {
+      return delegate.visitFreeVariable(f, unescapeName(name));
+    }
+
+    @Override
+    public R visitBoundVariable(Formula f, int deBruijnIdx) {
+      return delegate.visitBoundVariable(f, deBruijnIdx);
+    }
+
+    @Override
+    public R visitConstant(Formula f, Object value) {
+      return delegate.visitConstant(f, value);
+    }
+
+    @Override
+    public R visitQuantifier(
+        BooleanFormula f,
+        Quantifier quantifier,
+        List<Formula> boundVariables,
+        BooleanFormula body) {
+      return delegate.visitQuantifier(f, quantifier, boundVariables, body);
+    }
+
+    @Override
+    public R visitFunction(
+        Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+      return delegate.visitFunction(
+          f,
+          args,
+          FunctionDeclarationImpl.of(
+              unescapeName(functionDeclaration.getName()),
+              functionDeclaration.getKind(),
+              functionDeclaration.getArgumentTypes(),
+              functionDeclaration.getType(),
+              ((FunctionDeclarationImpl<?, ?>) functionDeclaration).getSolverDeclaration()));
+    }
+  }
 
   /**
    * @see org.sosy_lab.java_smt.api.FormulaManager#visit
@@ -560,11 +783,83 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   }
 
   /** Variable names (symbols) can be wrapped with "|". This function removes those chars. */
-  protected static String dequote(String s) {
+  @VisibleForTesting
+  public static String dequote(String s) {
     int l = s.length();
-    if (s.charAt(0) == '|' && s.charAt(l - 1) == '|') {
+    if (l >= 2 && s.charAt(0) == '|' && s.charAt(l - 1) == '|') {
       return s.substring(1, l - 1);
     }
     return s;
+  }
+
+  private static boolean isReservedName(String pVar) {
+    return pVar.isEmpty()
+        || pVar.matches("^-?[0-9].*")
+        || pVar.startsWith("'")
+        || pVar.startsWith("fp.")
+        || pVar.startsWith("re.")
+        || pVar.startsWith("str.")
+        || RESERVED.contains(pVar);
+  }
+
+  @VisibleForTesting
+  public static boolean isValidName(String pVar) {
+    return !isReservedName(pVar) && !DISALLOWED_CHARACTERS.matchesAnyOf(pVar);
+  }
+
+  /* This escaping works for simple escape sequences only, i.e., keywords are unique enough. */
+  @VisibleForTesting
+  public static String escapeName(String pVar) {
+    // as long as keywords stay simple, this simple escaping is sufficient
+    String prefix = "";
+    if (isReservedName(pVar)) {
+      prefix += ESCAPE;
+    }
+    if (pVar.indexOf(ESCAPE) != -1) {
+      pVar = pVar.replace("" + ESCAPE, "" + ESCAPE + ESCAPE);
+    }
+    if (DISALLOWED_CHARACTERS.matchesAnyOf(pVar)) {
+      for (Map.Entry<Character, String> e : DISALLOWED_CHARACTER_REPLACEMENT.entrySet()) {
+        pVar = pVar.replace(e.getKey().toString(), ESCAPE + e.getValue());
+      }
+    }
+    return prefix + pVar;
+  }
+
+  static String unescapeName(String pVar) {
+    int idx = pVar.indexOf(ESCAPE);
+    if (idx != -1) {
+      // unescape BASIC_OPERATORS and SMTLIB2_KEYWORDS
+      if (idx == 0) {
+        String tmp = pVar.substring(1);
+        if (!isValidName(tmp)) {
+          pVar = tmp;
+        }
+      }
+
+      // unescape DISALLOWED_CHARACTERS
+      StringBuilder str = new StringBuilder();
+      for (int i = 0; i < pVar.length(); i++) {
+        if (pVar.charAt(i) == ESCAPE) {
+          if (pVar.charAt(i + 1) == ESCAPE) {
+            str.append(ESCAPE);
+            i++;
+          } else {
+            String rest = pVar.substring(i + 1);
+            for (Map.Entry<Character, String> e : DISALLOWED_CHARACTER_REPLACEMENT.entrySet()) {
+              if (rest.startsWith(e.getValue())) {
+                str.append(e.getKey());
+                i += e.getValue().length();
+                break;
+              }
+            }
+          }
+        } else {
+          str.append(pVar.charAt(i));
+        }
+      }
+      return str.toString();
+    }
+    return pVar; // unchanged
   }
 }

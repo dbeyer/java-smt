@@ -8,7 +8,7 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
-import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
+import static org.sosy_lab.java_smt.basicimpl.FormulaCreator.escapeName;
 
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
@@ -65,8 +65,8 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
           FTI extends FormulaType<TI>,
           FTE extends FormulaType<TE>>
       ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType) {
-    checkVariableName(pName);
-    final TFormulaInfo namedArrayFormula = internalMakeArray(pName, pIndexType, pElementType);
+    final TFormulaInfo namedArrayFormula =
+        internalMakeArray(escapeName(pName), pIndexType, pElementType);
     return getFormulaCreator().encapsulateArray(namedArrayFormula, pIndexType, pElementType);
   }
 

@@ -10,10 +10,12 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
+import static org.sosy_lab.java_smt.basicimpl.FormulaCreator.escapeName;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -77,8 +79,9 @@ public abstract class AbstractEnumerationFormulaManager<TFormulaInfo, TType, TEn
 
   @Override
   public EnumerationFormulaType declareEnumeration(String pName, Set<String> pElementNames) {
-    checkVariableName(pName);
-    return declareEnumerationImpl(pName, pElementNames);
+    return declareEnumerationImpl(
+        escapeName(pName),
+        ImmutableSet.copyOf(Iterables.transform(pElementNames, FormulaCreator::escapeName)));
   }
 
   protected EnumerationFormulaType declareEnumerationImpl(String pName, Set<String> pElementNames) {
@@ -114,8 +117,7 @@ public abstract class AbstractEnumerationFormulaManager<TFormulaInfo, TType, TEn
 
   @Override
   public EnumerationFormula makeVariable(String pVar, EnumerationFormulaType pType) {
-    checkVariableName(pVar);
-    return wrap(makeVariableImpl(pVar, pType));
+    return wrap(makeVariableImpl(escapeName(pVar), pType));
   }
 
   protected TFormulaInfo makeVariableImpl(String pVar, EnumerationFormulaType pType) {

@@ -30,6 +30,7 @@ import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
+import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Integer, Long, Integer> {
 
@@ -133,7 +134,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
   private static String quote(String str) {
     Preconditions.checkArgument(!Strings.isNullOrEmpty(str));
     Preconditions.checkArgument(CharMatcher.anyOf("|\\").matchesNoneOf(str));
-    Preconditions.checkArgument(!SMTLIB2_KEYWORDS.contains(str));
+    Preconditions.checkArgument(FormulaCreator.isValidName(str));
 
     if (VALID_CHARS.matchesAllOf(str) && !DIGITS.matches(str.charAt(0))) {
       // simple symbol

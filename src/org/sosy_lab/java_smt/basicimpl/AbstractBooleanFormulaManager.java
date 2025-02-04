@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
-import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
@@ -40,6 +39,7 @@ import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.basicimpl.FormulaCreator.SymbolViewVisitor;
 
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
@@ -60,8 +60,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
   @Override
   public BooleanFormula makeVariable(String pVar) {
-    checkVariableName(pVar);
-    return wrap(makeVariableImpl(pVar));
+    return wrap(makeVariableImpl(FormulaCreator.escapeName(pVar)));
   }
 
   protected abstract TFormulaInfo makeVariableImpl(String pVar);
@@ -279,21 +278,26 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
   @Override
   public <R> R visit(BooleanFormula pFormula, BooleanFormulaVisitor<R> visitor) {
-    return formulaCreator.visit(pFormula, new DelegatingFormulaVisitor<>(visitor));
+    return formulaCreator.visit(
+        pFormula, new SymbolViewVisitor<>(new DelegatingFormulaVisitor<>(visitor)));
   }
 
   @Override
   public void visitRecursively(
       BooleanFormula pF, BooleanFormulaVisitor<TraversalProcess> pFormulaVisitor) {
     formulaCreator.visitRecursively(
-        new DelegatingFormulaVisitor<>(pFormulaVisitor), pF, p -> p instanceof BooleanFormula);
+        new SymbolViewVisitor<>(new DelegatingFormulaVisitor<>(pFormulaVisitor)),
+        pF,
+        p -> p instanceof BooleanFormula);
   }
 
   @Override
   public BooleanFormula transformRecursively(
       BooleanFormula f, BooleanFormulaTransformationVisitor pVisitor) {
     return formulaCreator.transformRecursively(
-        new DelegatingFormulaVisitor<>(pVisitor), f, p -> p instanceof BooleanFormula);
+        new SymbolViewVisitor<>(new DelegatingFormulaVisitor<>(pVisitor)),
+        f,
+        p -> p instanceof BooleanFormula);
   }
 
   private class DelegatingFormulaVisitor<R> implements FormulaVisitor<R> {

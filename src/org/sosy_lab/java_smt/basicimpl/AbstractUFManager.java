@@ -8,8 +8,6 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
-import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
-
 import com.google.common.collect.Lists;
 import java.util.Arrays;
 import java.util.List;
@@ -39,20 +37,19 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   @Override
   public final <T extends Formula> FunctionDeclaration<T> declareUF(
       String pName, FormulaType<T> pReturnType, List<FormulaType<?>> pArgTypes) {
-    checkVariableName(pName);
     List<TType> argTypes = Lists.transform(pArgTypes, this::toSolverType);
     return FunctionDeclarationImpl.of(
         pName,
         FunctionDeclarationKind.UF,
         pArgTypes,
         pReturnType,
-        formulaCreator.declareUFImpl(pName, toSolverType(pReturnType), argTypes));
+        formulaCreator.declareUFImpl(
+            FormulaCreator.escapeName(pName), toSolverType(pReturnType), argTypes));
   }
 
   @Override
   public <T extends Formula> FunctionDeclaration<T> declareUF(
       String pName, FormulaType<T> pReturnType, FormulaType<?>... pArgs) {
-    checkVariableName(pName);
     return declareUF(pName, pReturnType, Arrays.asList(pArgs));
   }
 
@@ -70,7 +67,6 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   @Override
   public <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, List<Formula> pArgs) {
-    checkVariableName(name);
     List<FormulaType<?>> argTypes = Lists.transform(pArgs, getFormulaCreator()::getFormulaType);
     FunctionDeclaration<T> func = declareUF(name, pReturnType, argTypes);
     return callUF(func, pArgs);
@@ -79,7 +75,6 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   @Override
   public <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, Formula... pArgs) {
-    checkVariableName(name);
     return declareAndCallUF(name, pReturnType, Arrays.asList(pArgs));
   }
 }

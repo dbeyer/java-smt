@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -110,8 +109,7 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public StringFormula makeVariable(String pVar) {
-    checkVariableName(pVar);
-    return wrapString(makeVariableImpl(pVar));
+    return wrapString(makeVariableImpl(FormulaCreator.escapeName(pVar)));
   }
 
   protected abstract TFormulaInfo makeVariableImpl(String pVar);
