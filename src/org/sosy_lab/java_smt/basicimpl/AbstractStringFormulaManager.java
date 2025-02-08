@@ -38,7 +38,7 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
               + "((?<codePoint>[0-9a-fA-F]{4})"
               + "|"
               // or curly brackets like "\\u{61}"
-              + "(\\{(?<codePointInBrackets>[0-9a-fA-F]{1,5})}))");
+              + "(\\{(?<codePointInBrackets>[0-9a-fA-F]{1,5})\\}))");
 
   protected AbstractStringFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
@@ -78,7 +78,11 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
   protected static String escapeUnicodeForSmtlib(String input) {
     StringBuilder sb = new StringBuilder();
     for (int codePoint : input.codePoints().toArray()) {
-      if (0x20 <= codePoint && codePoint <= 0x7E) {
+      if (codePoint == 0x5c) {
+        // Backslashes must be escaped, otherwise they may get substituted when reading back
+        // the results from the model
+        sb.append("\\u{5c}");
+      } else if (0x20 <= codePoint && codePoint <= 0x7E) {
         sb.appendCodePoint(codePoint); // normal printable chars
       } else {
         sb.append("\\u{").append(String.format("%05X", codePoint)).append("}");
@@ -100,7 +104,13 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
       checkArgument(
           isCodePointInRange(codePoint),
           "SMTLIB does only specify Unicode letters from Planes 0-2");
-      matcher.appendReplacement(sb, Character.toString(codePoint));
+      String replacement = Character.toString(codePoint);
+      if (replacement.equals("\\")) {
+        // Matcher.appendReplacement considers '\' as special character.
+        // Substitute with '\\' instead
+        replacement = "\\\\";
+      }
+      matcher.appendReplacement(sb, replacement);
     }
     matcher.appendTail(sb);
     return sb.toString();
